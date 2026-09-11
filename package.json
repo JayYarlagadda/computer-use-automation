@@ -12,7 +12,9 @@
     "target:b": "tsx targets/meridian/server.ts --tenant b --port 4174",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "verify": "npm run typecheck && npm test"
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "verify": "npm run check:secrets && npm run typecheck && npm test",
+    "prepare": "node scripts/install-hooks.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",

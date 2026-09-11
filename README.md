@@ -90,13 +90,28 @@ transient.
 
 ## Keys
 
-Copy `.env.example` to `.env` and fill in **one** provider key. `.env` is
-gitignored and no credential is ever written into an artifact, a log or the
-evidence directory — a capability records the *name* of a secret and resolves
-it at run time, which is what makes a sign-on flow safe to commit.
+Copy `.env.example` to `.env` and fill in **one** provider key. Put it in
+`.env`, never in `.env.example` — the example file is tracked, the real one is
+not.
 
 ```bash
 cp .env.example .env
+```
+
+No credential is ever written into an artifact, a log or the evidence
+directory. A capability records the *name* of a secret and resolves it at run
+time, which is what makes a sign-on flow safe to commit to a public repository.
+
+That is enforced rather than promised. A pre-commit hook, installed
+automatically by `npm install`, scans every tracked and staged file for
+credential shapes and refuses the commit if it finds one. The same scan runs
+inside `npm run verify`, and inside `evidence/` it also looks for regulated
+values — SSN shapes and card-length digit runs — which are allowed in the mock
+bank's fixtures, because redaction needs something to redact, but never in a
+recorded run.
+
+```bash
+npm run check:secrets
 ```
 
 ## How it is put together
