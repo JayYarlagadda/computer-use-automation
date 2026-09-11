@@ -27,7 +27,13 @@ export const DEFAULT_POLICY: PolicyConfig = {
   allowedRoutes: ['/', '/login', '/logout', '/app', '/nav', '/notice', '/search', '/member/*', '/member/*/adjust', '/transactions'],
   allowedActions: ['click', 'type', 'select', 'press', 'navigate', 'read', 'wait'],
   irreversiblePatterns: [
-    'post\\s+adjustment',
+    // Deliberately matches the *link* to the adjustment screen as well as the
+    // submit button on it ("Post Balance Adjustment" and "Post Adjustment").
+    // Over-blocking a navigation is the right error to make here: a capability
+    // that legitimately needs that screen needs approval for the commit one
+    // step later anyway, so gating the entrance costs nothing and closes the
+    // window where an unattended run is sitting on a money-moving form.
+    'post\\b[\\w\\s]*\\badjust',
     'transfer',
     'delete',
     'remove',
@@ -39,12 +45,37 @@ export const DEFAULT_POLICY: PolicyConfig = {
     'submit\\s+payment',
   ],
   redactPatterns: [
+    // Digit-boundary lookarounds, NOT \b. A word boundary needs a non-word
+    // character on one side, and the text these patterns run against is often
+    // concatenated cell content with no separator at all -- "SSN412-88-0173"
+    // out of a table row's innerText. There is no \b between "N" and "4", so
+    // a \b-anchored pattern silently misses the one place the value is most
+    // likely to leak. Anchoring on "not preceded/followed by a digit" keeps
+    // the guard against matching a fragment of a longer number without
+    // depending on the surrounding text being tokenised.
+    //
     // SSN-shaped values.
-    '\\b\\d{3}-\\d{2}-\\d{4}\\b',
+    '(?<!\\d)\\d{3}-\\d{2}-\\d{4}(?!\\d)',
     // Long digit runs: account and card numbers.
-    '\\b\\d{12,19}\\b',
+    '(?<!\\d)\\d{12,19}(?!\\d)',
   ],
 };
+
+/**
+ * A policy scoped to one running target.
+ *
+ * Origins are a property of the deployment, not of the code: the same
+ * capability runs against tenant A on one host and tenant B on another, and
+ * tests run against an OS-assigned port. Baking a port into the default is
+ * fine as a convenience; making it the only way to build a policy is not.
+ */
+export function policyFor(origins: string | string[], overrides: Partial<PolicyConfig> = {}): PolicyEngine {
+  return new PolicyEngine({
+    ...DEFAULT_POLICY,
+    allowedOrigins: Array.isArray(origins) ? origins : [origins],
+    ...overrides,
+  });
+}
 
 /** "/member/*" matches "/member/100245" but not "/member/100245/adjust". */
 function routeMatches(pattern: string, path: string): boolean {

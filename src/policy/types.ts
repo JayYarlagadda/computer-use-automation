@@ -52,7 +52,15 @@ export type PolicyDenialCode =
   | 'ORIGIN_NOT_ALLOWED'
   | 'ROUTE_NOT_ALLOWED'
   | 'ACTION_TYPE_NOT_ALLOWED'
-  | 'IRREVERSIBLE_UNATTENDED';
+  | 'IRREVERSIBLE_UNATTENDED'
+  /**
+   * The action itself was permitted, but it left us somewhere the allowlist
+   * forbids -- a link click to an off-allowlist screen, a form post, a
+   * scripted redirect. Raised after the fact by the surface, which then
+   * returns to where it started. Distinct from ROUTE_NOT_ALLOWED because the
+   * system did move and then undid it, which is worth seeing in evidence.
+   */
+  | 'NAVIGATED_OFF_ALLOWLIST';
 
 export interface PolicyContext {
   mode: ExecutionMode;

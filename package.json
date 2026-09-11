@@ -9,6 +9,7 @@
   },
   "scripts": {
     "target": "tsx targets/meridian/server.ts",
+    "target:b": "tsx targets/meridian/server.ts --tenant b --port 4174",
     "discover": "tsx src/cli/index.ts discover",
     "replay": "tsx src/cli/index.ts replay",
     "catalog": "tsx src/cli/index.ts catalog",

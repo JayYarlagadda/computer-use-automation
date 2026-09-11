@@ -37,28 +37,35 @@ interface ArmedFault {
   delayMs?: number;
 }
 
-const armed = new Map<FaultKind, ArmedFault>();
-
-export function armFault(kind: FaultKind, count = 1, delayMs?: number): void {
-  armed.set(kind, { kind, remaining: count, delayMs });
-}
-
-export function clearFaults(): void {
-  armed.clear();
-}
-
-export function listFaults(): ArmedFault[] {
-  return [...armed.values()];
-}
-
 /**
- * Returns true if this fault should fire now, decrementing its budget.
- * Consuming on read is what makes transient faults self-healing.
+ * Armed faults are held per running instance rather than per module, so two
+ * tenants can run in one process without arming each other's faults. The
+ * cross-tenant tests depend on that isolation.
  */
-export function consumeFault(kind: FaultKind): ArmedFault | undefined {
-  const f = armed.get(kind);
-  if (!f || f.remaining <= 0) return undefined;
-  f.remaining -= 1;
-  if (f.remaining <= 0) armed.delete(kind);
-  return f;
+export class FaultBox {
+  private readonly armed = new Map<FaultKind, ArmedFault>();
+
+  arm(kind: FaultKind, count = 1, delayMs?: number): void {
+    this.armed.set(kind, { kind, remaining: count, delayMs });
+  }
+
+  clear(): void {
+    this.armed.clear();
+  }
+
+  list(): ArmedFault[] {
+    return [...this.armed.values()];
+  }
+
+  /**
+   * Returns the fault if it should fire now, decrementing its budget.
+   * Consuming on read is what makes transient faults self-healing.
+   */
+  consume(kind: FaultKind): ArmedFault | undefined {
+    const f = this.armed.get(kind);
+    if (!f || f.remaining <= 0) return undefined;
+    f.remaining -= 1;
+    if (f.remaining <= 0) this.armed.delete(kind);
+    return f;
+  }
 }

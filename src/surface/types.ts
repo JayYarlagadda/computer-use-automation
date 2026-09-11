@@ -18,6 +18,8 @@
  * are never given any.
  */
 
+import type { RiskClass } from '../policy/types.js';
+
 /**
  * A control on the surface, as an operator would perceive it.
  *
@@ -105,12 +107,36 @@ export type Action =
 
 export type ActionType = Action['type'];
 
+/**
+ * An action that was refused rather than attempted.
+ *
+ * This is a *value*, not an exception, because the two callers both need to
+ * carry on afterwards: the discovery loop tells the model "that was refused,
+ * choose differently" and takes another turn, and the replay executor routes
+ * an `approval-required` refusal into escalation. Throwing would force both to
+ * reconstruct control flow from a catch block.
+ */
+export interface ActRefusal {
+  /** `denied` is final. `approval-required` is a request for a human. */
+  kind: 'denied' | 'approval-required';
+  /** Stable machine-readable cause; see PolicyDenialCode. */
+  code: string;
+  reason: string;
+  risk: RiskClass;
+}
+
 export interface ActResult {
   ok: boolean;
   /** Populated for `read`. */
   value?: string;
   /** Why the action could not be performed, if it could not. */
   error?: string;
+  /**
+   * Set when the action was refused by policy rather than failing
+   * mechanically. `ok` is false either way, but the distinction matters: a
+   * refusal is the system working, a failure is the surface not cooperating.
+   */
+  refusal?: ActRefusal;
 }
 
 /**

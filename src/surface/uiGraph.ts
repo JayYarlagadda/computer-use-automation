@@ -248,9 +248,19 @@ export function collectUiGraph(prefix: string): RawFrameGraph {
     const name = nameOf(el);
     const visible = isVisible(el);
 
-    // Cells are collected because reading data out of a table is a first-class
-    // action, but an empty cell is noise.
-    if ((role === 'cell' || role === 'columnheader') && !name) continue;
+    if (role === 'cell' || role === 'columnheader') {
+      // Cells are collected because reading data out of a table is a
+      // first-class action, but an empty cell is noise.
+      if (!name) continue;
+
+      // So is a layout cell. Legacy screens nest tables several deep for
+      // positioning, and an outer cell's text is the concatenation of
+      // everything inside it -- which bloats the model's view of the screen,
+      // makes targeting ambiguous (two nodes "named" the same data), and
+      // produces exactly the run-together strings that defeat pattern-based
+      // redaction. A cell that contains another cell is structure, not data.
+      if (el.querySelector('td, th')) continue;
+    }
     if (!visible) continue;
 
     const rect = el.getBoundingClientRect();
@@ -283,6 +293,14 @@ export function collectUiGraph(prefix: string): RawFrameGraph {
     nodes,
     title: document.title,
     location: location.href,
-    text: clean(document.body?.innerText ?? '').slice(0, 20000),
+    // Line structure is preserved deliberately. Checkpoint predicates match
+    // against this text, and collapsing newlines runs adjacent table cells
+    // together -- which both weakens the predicates and manufactures the
+    // concatenated strings that pattern redaction has the hardest time with.
+    text: (document.body?.innerText ?? '')
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+      .slice(0, 20000),
   };
 }
