@@ -126,6 +126,11 @@ export function memberScreen(t: TenantConfig, m: Member): string {
   <tr><td align="right">SSN</td><td>${esc(m.ssn)}</td>
       <td align="right">Joined</td><td>${esc(m.joined)}</td></tr>
   <tr><td align="right">Branch</td><td>${esc(m.branch)}</td><td align="right">Status</td><td>Active</td></tr>
+  ${
+    m.notes
+      ? `<tr><td align="right" valign="top">Notes</td><td colspan="3">${esc(m.notes)}</td></tr>`
+      : ''
+  }
 </table>
 <br>
 <table cellpadding="6" cellspacing="0" border="1" bordercolor="#c0c0c0" bgcolor="#ffffff">
