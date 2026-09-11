@@ -1,0 +1,338 @@
+/**
+ * A reference artifact for the flow the system is built around:
+ * "look up member {memberId} and read their current savings balance".
+ *
+ * Written by hand, before the compiler exists, for one reason: a schema is
+ * only as good as the thing it can express, and the honest way to find out
+ * whether this one can express a real flow is to try to write that flow in it
+ * and see what is missing. Several parts of ./src/artifact/schema.ts exist
+ * because they were missing the first time through -- optional steps, global
+ * recovery rules, and secrets as a value source rather than a parameter.
+ *
+ * It doubles as the golden fixture the artifact tests run against, and as the
+ * target the discovery compiler has to produce something equivalent to.
+ */
+
+import type { CapabilityArtifactInput } from '../../src/artifact/schema.js';
+
+export const readSavingsBalance: CapabilityArtifactInput = {
+  schemaVersion: '1.0.0',
+
+  capability: {
+    id: 'meridian.member.read-savings-balance',
+    version: '1.0.0',
+    title: "Read a member's savings balance",
+    description:
+      'Signs on to the servicing application, looks up a member by their six-digit member number, ' +
+      'and returns the current balance of their savings account along with the account number and ' +
+      "the member's name. Read-only: nothing is modified.",
+  },
+
+  app: {
+    vendor: 'Meridian Systems',
+    product: 'CoreBank Servicing',
+    productVersion: '7.2.11',
+    surfaceKind: 'browser',
+    recordedOnTenant: 'a',
+  },
+
+  inputs: [
+    {
+      name: 'memberId',
+      type: 'string',
+      description: 'The six-digit member number to look up.',
+      required: true,
+      sensitivity: 'internal',
+      pattern: '^\\d{6}$',
+      minLength: 6,
+      maxLength: 6,
+      example: '100245',
+    },
+  ],
+
+  outputs: [
+    {
+      name: 'memberName',
+      type: 'string',
+      description: 'Full name on the member record.',
+      sensitivity: 'restricted',
+      required: true,
+      extract: {
+        kind: 'node-text',
+        target: {
+          description: "the cell holding the member's name",
+          framePath: ['contentFrame'],
+          strategies: [
+            { kind: 'anchor', role: 'cell', precedingText: 'Name', match: 'exact' },
+            { kind: 'structural', role: 'cell', sectionText: 'Member Detail', ordinalInRole: 6 },
+          ],
+          notes:
+            'The name is a bare table cell with no accessible name of its own, so it is addressed ' +
+            'by the label cell to its left. Structural rank is a fallback only; it depends on cell ' +
+            'ordering and resolving there should be treated as drift.',
+        },
+        transforms: ['trim'],
+      },
+    },
+    {
+      name: 'savingsBalance',
+      type: 'currency',
+      description: 'Current balance of the savings account, as a decimal string.',
+      sensitivity: 'internal',
+      required: true,
+      extract: {
+        kind: 'node-text',
+        target: {
+          description: 'the balance cell in the Savings row of the accounts table',
+          framePath: ['contentFrame'],
+          strategies: [
+            { kind: 'anchor', role: 'cell', rowText: 'Savings', match: 'contains' },
+            { kind: 'structural', role: 'cell', sectionText: 'Share Accounts', ordinalInRole: 22 },
+          ],
+          notes:
+            'Row-scoped rather than positional: the accounts table has a variable number of rows ' +
+            'and savings is not always first. The anchor names the row, not its index.',
+        },
+        transforms: ['trim', 'strip-currency'],
+      },
+    },
+    {
+      name: 'savingsAccountNumber',
+      type: 'string',
+      description: 'Account number of the savings account.',
+      sensitivity: 'restricted',
+      required: false,
+      extract: {
+        kind: 'text-pattern',
+        pattern: 'Savings\\s+(SV-\\d+)',
+        group: 1,
+        transforms: ['trim'],
+      },
+    },
+  ],
+
+  outcomes: [
+    {
+      code: 'MEMBER_NOT_FOUND',
+      title: 'No member with that number',
+      description:
+        'The member number is well-formed but no record exists. A legitimate answer to the ' +
+        'question that was asked, not an error.',
+      detect: { kind: 'text-present', text: 'No member found for number', match: 'contains' },
+      terminal: true,
+      outputs: [],
+    },
+    {
+      code: 'MEMBER_ID_INVALID',
+      title: 'Member number rejected by the application',
+      description:
+        "The application's own validation refused the input. Distinct from MEMBER_NOT_FOUND: " +
+        'the lookup never happened, so the caller should fix the input rather than conclude the ' +
+        'member does not exist.',
+      detect: { kind: 'text-present', text: 'must be exactly 6 digits', match: 'contains' },
+      terminal: true,
+      outputs: [],
+    },
+    {
+      code: 'PERMISSION_DENIED',
+      title: 'Operator is not entitled to view this member',
+      description:
+        'The record exists but the signed-on operator lacks entitlement. The caller learns the ' +
+        'member is real and that a different operator profile would be needed.',
+      detect: {
+        kind: 'all',
+        of: [
+          { kind: 'text-present', text: 'Access Denied', match: 'contains' },
+          { kind: 'text-present', text: 'not authorised to view member', match: 'contains' },
+        ],
+      },
+      terminal: true,
+      outputs: [],
+    },
+  ],
+
+  risk: 'safe',
+  approval: { state: 'draft' },
+
+  steps: [
+    {
+      id: 'open-signon',
+      intent: 'Open the servicing application sign-on screen',
+      action: { type: 'navigate', location: { pathTemplate: '/', params: {} } },
+      checkpoint: { kind: 'text-present', text: 'Operator Sign On', match: 'contains' },
+    },
+    {
+      id: 'enter-operator',
+      intent: 'Enter the operator ID',
+      action: { type: 'type', value: { from: 'secret', ref: 'MERIDIAN_OPERATOR_ID' } },
+      target: {
+        description: 'the Operator ID field',
+        framePath: [],
+        strategies: [{ kind: 'anchor', role: 'textbox', precedingText: 'Operator ID', match: 'exact' }],
+        notes:
+          'There is no role+name rung for this control because it genuinely has no accessible ' +
+          'name: the sign-on form has no label association at all, and the visible label is the ' +
+          'adjacent table cell. This is the case anchor-relative targeting exists for.',
+      },
+    },
+    {
+      id: 'enter-password',
+      intent: 'Enter the operator password',
+      action: { type: 'type', value: { from: 'secret', ref: 'MERIDIAN_OPERATOR_PASSWORD' } },
+      target: {
+        description: 'the Password field',
+        framePath: [],
+        strategies: [{ kind: 'anchor', role: 'textbox', precedingText: 'Password', match: 'exact' }],
+        notes: 'Credentials are secret references resolved at replay time; no value is recorded here.',
+      },
+    },
+    {
+      id: 'submit-signon',
+      intent: 'Submit the sign-on form',
+      action: { type: 'click' },
+      target: {
+        description: 'the Sign On button',
+        framePath: [],
+        strategies: [
+          { kind: 'role-name', role: 'button', name: 'Sign On', match: 'exact' },
+          { kind: 'structural', role: 'button', sectionText: 'Operator Sign On', ordinalInRole: 0 },
+        ],
+      },
+      checkpoint: { kind: 'text-absent', text: 'Invalid operator ID', match: 'contains' },
+    },
+    {
+      id: 'dismiss-notice',
+      intent: 'Acknowledge the post-sign-on notice, if this institution shows one',
+      optional: true,
+      action: { type: 'click' },
+      target: {
+        description: 'the Acknowledge and Continue link on the notice screen',
+        framePath: [],
+        strategies: [{ kind: 'role-name', role: 'link', name: 'Acknowledge and Continue', match: 'exact' }],
+        notes:
+          'Optional because it is tenant-configured: institution A goes straight through and ' +
+          'institution B interposes a notice. Modelling it as an optional step rather than two ' +
+          'artifacts is the whole argument for tenant binding over re-recording.',
+      },
+    },
+    {
+      id: 'enter-member-id',
+      intent: 'Type the member number into the search form',
+      action: { type: 'type', value: { from: 'param', param: 'memberId' } },
+      target: {
+        description: 'the Member ID field on the search screen',
+        framePath: ['contentFrame'],
+        strategies: [
+          { kind: 'anchor', role: 'textbox', precedingText: 'Member ID', match: 'exact' },
+          { kind: 'structural', role: 'textbox', sectionText: 'Member Search', ordinalInRole: 0 },
+        ],
+        notes:
+          'Anchor text "Member ID" is the label wording, which differs per institution -- this is ' +
+          'exactly what a tenant overlay remaps.',
+      },
+    },
+    {
+      id: 'submit-search',
+      intent: 'Run the member search',
+      action: { type: 'click' },
+      target: {
+        description: 'the Search button',
+        framePath: ['contentFrame'],
+        strategies: [
+          { kind: 'role-name', role: 'button', name: 'Search', match: 'exact' },
+          { kind: 'structural', role: 'button', sectionText: 'Member Search', ordinalInRole: 0 },
+        ],
+      },
+      checkpoint: {
+        kind: 'any',
+        of: [
+          { kind: 'text-present', text: 'Member Detail', match: 'contains' },
+          // The declared outcomes are also acceptable landing states. Without
+          // this, a legitimate "not found" would fail the step's checkpoint and
+          // be reported as a broken capability rather than as an answer.
+          { kind: 'text-present', text: 'No member found for number', match: 'contains' },
+          { kind: 'text-present', text: 'must be exactly 6 digits', match: 'contains' },
+          { kind: 'text-present', text: 'Access Denied', match: 'contains' },
+        ],
+      },
+    },
+  ],
+
+  successCheckpoint: {
+    kind: 'all',
+    of: [
+      { kind: 'text-present', text: 'Member Detail', match: 'contains' },
+      { kind: 'text-present', text: 'Share Accounts', match: 'contains' },
+      { kind: 'text-present', text: 'Savings', match: 'contains' },
+    ],
+  },
+
+  recovery: [
+    {
+      id: 'dismiss-unexpected-interstitial',
+      description: 'A system notice appeared in front of the screen we wanted. Acknowledge and continue.',
+      when: { kind: 'text-present', text: 'System Notice', match: 'contains' },
+      then: {
+        kind: 'click',
+        target: {
+          description: 'the Acknowledge and Continue link',
+          framePath: [],
+          strategies: [{ kind: 'role-name', role: 'link', name: 'Acknowledge and Continue', match: 'exact' }],
+        },
+      },
+      maxAttempts: 2,
+    },
+    {
+      id: 'reauthenticate',
+      description: 'The session expired mid-flow. Sign on again, then retry the step.',
+      when: { kind: 'text-present', text: 'Your session has expired', match: 'contains' },
+      then: { kind: 'run-capability', capabilityId: 'meridian.auth.sign-on', version: '1.0.0' },
+      maxAttempts: 1,
+    },
+    {
+      id: 'retry-transient-app-error',
+      description: 'The servicing host returned an error screen. Retry once before giving up.',
+      when: { kind: 'text-present', text: 'Unexpected System Error', match: 'contains' },
+      then: { kind: 'retry-step', delayMs: 1500 },
+      maxAttempts: 1,
+    },
+    {
+      id: 'escalate-on-entitlement-change',
+      description:
+        'Entitlements were refused on a screen where the flow did not expect it. A person has to ' +
+        'decide whether this operator profile should have access.',
+      when: { kind: 'text-present', text: 'Contact the branch administrator', match: 'contains' },
+      then: { kind: 'escalate', reason: 'Operator entitlement appears to have changed mid-flow.' },
+      maxAttempts: 1,
+    },
+  ],
+
+  tenantOverlays: [
+    {
+      tenantId: 'b',
+      productVersion: '7.4.03',
+      // Everything institution B needs, for the same flow, is wording.
+      labels: {
+        'Member ID': 'Member No.',
+        Search: 'Find Member',
+        'Member Search': 'Locate Member',
+        'Share Accounts': 'Deposit Accounts',
+        'Current Balance': 'Balance',
+      },
+      steps: {},
+      notes:
+        'Summit Federal runs the same vendor product on a later minor version with its own ' +
+        'wording, and shows a notice after sign-on -- which the base artifact already handles as ' +
+        'an optional step, so no override is needed for it.',
+    },
+  ],
+
+  provenance: {
+    goal: 'Look up member 100245 and read their current savings balance.',
+    recordedAt: '2026-09-10T00:00:00.000Z',
+    discoveryRunId: 'fixture-handwritten',
+    model: { provider: 'none', model: 'hand-written reference', promptVersion: 'n/a' },
+    stepsExplored: 7,
+    stepsKept: 7,
+  },
+};
