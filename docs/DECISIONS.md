@@ -241,3 +241,189 @@ import it. Practically, cheap models can be used for iteration and a strong one
 for the recorded evidence run; and the `mock` provider means a reviewer with no
 API key can still exercise the discovery path, which the deliverables section
 asks for ("how to run without live services").
+
+---
+
+## D9 — The guardrail checks the consequence of an action, not only its intent
+
+**Options considered**
+
+1. Check the allowlist before acting, which is what D4 originally built.
+2. Read link destinations at record time and pre-validate them.
+3. Check before *and* after: re-evaluate where the action actually left us,
+   and revert if it is somewhere the allowlist forbids.
+
+**Choice** — (3).
+
+**Why.** (1) has a hole, and it is not hypothetical — a test found it. A click
+is authorised against the page it happens *on*, so clicking a link into an
+off-allowlist screen passes the pre-check and lands somewhere the agent was
+never permitted to be. On the target app, clicking "Administration" from the
+nav frame reached `/admin` cleanly despite `/admin` being deliberately absent
+from `allowedRoutes`.
+
+(2) does not survive contact with this environment. An `href` is markup, which
+perception deliberately does not expose (D1); it does not exist at all on a
+desktop surface; and it would still miss form posts and scripted redirects,
+which is how most navigation happens on these screens.
+
+So containment is detective rather than preventive: notice, revert, and report
+under a distinct code, `NAVIGATED_OFF_ALLOWLIST`, so a constrained run is
+visible in evidence rather than quietly wrong. Every frame is checked, not just
+the top-level page — on a frameset the whole point of a nav link is that it
+retargets a child frame while the address bar never moves, so a
+top-level-only check passes while the agent sits on a forbidden screen.
+
+**What would invalidate this.** An action whose side effect is irreversible
+before we can revert it. Reverting a *navigation* is cheap; reverting a posted
+transaction is not. That case is handled one layer earlier, by refusing
+irreversible actions outright rather than containing them afterwards — which
+is why both mechanisms exist rather than either one alone.
+
+---
+
+## D10 — Redaction happens at the perception boundary, and marks only its own node
+
+**Options considered**
+
+1. Redact when writing evidence and prompts, at each call site.
+2. Redact in `observe()`, the one function that produces every byte the rest
+   of the system ever sees.
+3. Classify fields in advance and redact by field identity.
+
+**Choice** — (2), with (3) as the declared-sensitivity mechanism in the
+artifact schema for values we are told about in advance.
+
+**Why.** (1) is the same mistake as enforcing a policy in a prompt: it works
+until someone adds a seventh place that serialises an observation. `observe()`
+is to perception what `act()` is to action — the single function both discovery
+and replay must pass through — so redacting there is unbypassable for the same
+reason the policy check is.
+
+A node whose *own* content had to be redacted is also marked `sensitive`, which
+means the same value is masked in screenshots and refused by `read` without
+anyone having enumerated "the SSN cell" in advance. Anchor text is redacted but
+does **not** taint the node: tainting on ambient row text would spread from one
+SSN cell across its whole row, masking the join date and the "SSN" label too.
+Over-redaction is its own failure mode — a capability that cannot read a join
+date because a neighbour was regulated is broken, and it teaches people to turn
+redaction off.
+
+One implementation note that is really a design point: the patterns use
+digit-boundary lookarounds rather than `\b`. A word boundary needs a non-word
+character on one side, and the text these patterns run against is concatenated
+cell content — `SSN412-88-0173` out of a table row. There is no `\b` between
+"N" and "4", so the `\b`-anchored version silently missed the one place the
+value was most likely to leak.
+
+**What would invalidate this.** Regulated data with no distinguishing shape —
+a member's legal name is PII and matches nothing. Pattern redaction cannot
+reach it, which is exactly why the artifact schema carries a declared
+`sensitivity` on every input and output instead of relying on patterns alone.
+The two mechanisms cover different halves of the problem and neither is
+sufficient.
+
+---
+
+## D11 — The artifact is data. Predicates are a closed vocabulary, never expressions
+
+**Options considered**
+
+1. Checkpoints as expression strings evaluated at replay (`text.includes(...)`).
+2. Checkpoints as embedded JavaScript or a small scripting language.
+3. A closed, serialisable predicate algebra: four leaf kinds plus
+   `all` / `any` / `not`.
+
+**Choice** — (3), and the same treatment for extraction rules, transforms and
+recovery actions.
+
+**Why.** Security first: an artifact is a document loaded from disk and
+executed against banking software. (1) and (2) put arbitrary logic inside that
+document, which turns "review this capability" into "audit this program" and
+turns a compromised artifact store into remote code execution. A closed
+vocabulary cannot express anything the executor does not already implement.
+
+It is also what makes the other requirements reachable. Data can be diffed
+between versions, rendered in an operator console, remapped by a tenant
+overlay, and — the reason it matters most — evaluated by code that has no way
+to call a model. That is determinism in the strong sense: given the same
+artifact and inputs, every decision is a function of the observed screen and
+nothing else.
+
+**What would invalidate this.** A flow needing a predicate the vocabulary
+cannot express. The answer is to extend the vocabulary, in a versioned schema
+change that gets reviewed — which is slower than an escape hatch, and is
+supposed to be.
+
+---
+
+## D12 — The reusable unit is (vendor, product); the tenant is a binding on top
+
+**Options considered**
+
+1. One artifact per tenant, re-recorded.
+2. One artifact per tenant, generated from a shared template.
+3. One artifact per (vendor, product), with per-tenant overlays applied at
+   bind time.
+
+**Choice** — (3).
+
+**Why.** The environment is hundreds of institutions running ~20 apps each,
+where many tenants run the *same vendor product* configured and branded
+differently. (1) means thousands of near-identical artifacts, each needing its
+own review and its own maintenance, and it is how a fix gets applied to 400 of
+the 500 places it was needed.
+
+The bet the overlay makes is specific and falsifiable: across tenants on one
+product, the *flow* is identical and the *wording* differs. If that holds, a
+tenant costs a few lines of label mapping. Step-level overrides exist for where
+it does not hold — and a tenant accumulating many overrides is a signal worth
+acting on, not a cost to absorb quietly.
+
+Two supporting details. Label remapping is whole-string only: substring
+replacement would rewrite a checkpoint "Member Search" into "Member Find
+Member" under a `Search -> Find Member` mapping, which is nonsense that still
+parses and still reads like an honest label. And binding reports
+`versionDrift` when the tenant's product version differs from the recorded one
+— not fatal, since these products change slowly, but it is the single most
+useful piece of context to have attached to a replay that later fails, so it
+travels with the result rather than being logged and lost.
+
+**What would invalidate this.** A vendor product whose tenants customise
+screen *flow*, not just wording — a tenant with an extra approval screen in the
+middle. Optional steps absorb the small version of that; the large version
+genuinely needs a separate artifact, and the honest answer is to detect it (via
+override count) rather than pretend one artifact covers it.
+
+---
+
+## D13 — Waiting is quiescence detection, not a load-state check
+
+**Options considered**
+
+1. Fixed sleeps.
+2. `page.waitForLoadState()`.
+3. Wait for observed page activity to stop, bounded by a timeout.
+
+**Choice** — (3).
+
+**Why.** (1) is simultaneously too long on a fast run and too short on a slow
+one, and "transient slowness" is a runtime condition replay is explicitly
+required to absorb. (2) looks correct and is not: load state is a property of
+the *main* frame, and on a frameset the main frame never moves. Submitting the
+search form navigates a child frame while the address bar sits on `/app`
+throughout, so a main-frame wait returns instantly.
+
+That produced the worst class of bug in this system: `observe()` returned a
+node graph from the search screen alongside page text from the member detail
+screen, and an agent reasoning over a screen it was not on. The fix has two
+halves — nodes and text now come from one evaluation per frame rather than two
+passes, so an observation is internally consistent by construction; and
+`settle()` waits for request and navigation events to go quiet, then confirms
+every frame has a document.
+
+**What would invalidate this.** A screen that polls on a timer, where activity
+never goes quiet. The bounded timeout keeps that from hanging, but the
+observation taken afterwards is a snapshot of a moving target — which is a real
+limitation, and the reason the locator ladder requires a *unique* match rather
+than trusting any single observation to be complete.

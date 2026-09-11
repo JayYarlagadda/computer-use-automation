@@ -72,8 +72,8 @@ Module layout under `src/`:
 |------------|-----------------------------------------------------------------------|--------|
 | `surface/` | Perceive and act on a surface. The seam to desktop/legacy.            | done   |
 | `policy/`  | Allowlist, risk classification, redaction. Enforced inside `act()`.   | done   |
-| `artifact/`| Zod schema, versioning, canonicalization, tenant overlays.            | next   |
-| `agent/`   | Discovery loop and the trace-to-artifact compiler.                    | todo   |
+| `artifact/`| Zod schema, versioning, canonicalization, tenant overlays.            | done   |
+| `agent/`   | Discovery loop and the trace-to-artifact compiler.                    | next   |
 | `replay/`  | Locator ladder, checkpoints, error taxonomy, result contract.         | todo   |
 | `hitl/`    | Session broker, control token, interventions, operator console.       | todo   |
 | `evidence/`| Structured JSONL logging, screenshots, redaction at the boundary.     | todo   |
@@ -109,9 +109,12 @@ is graded, and is intentionally unpolished.
 - [x] **Phase 0 — Toolchain, skeleton, decision log.** Commit `2cfb9ec`.
 - [x] **Phase 1 — Target app.** Commit `88c2cb5`.
 - [x] **Phase 2 — Surface + policy choke point.** Commit `39a13c7`.
-- [ ] **Phase 3 — Artifact schema.** In progress. Design it *before* the agent
-      loop, so the loop targets the contract rather than the contract being
-      reverse-engineered from whatever the loop emitted.
+- [x] **Phase 2.5 — Hardening pass.** Commit `64a7d49`. Six defects found by
+      writing tests against the claims in `DECISIONS.md`; see D9, D10 and D13.
+      `npm test` is now a real vitest suite over an in-process target.
+- [x] **Phase 3 — Artifact schema.** Commit `d662652`. Designed *before* the
+      agent loop, so the loop targets the contract rather than the contract
+      being reverse-engineered from whatever the loop emitted.
 - [ ] **Phase 4 — Discovery loop + compiler + real LLM run.** Needs an API key.
 - [ ] **Phase 5 — Replay engine + error taxonomy.** Produces three evidence
       runs: success, business outcome, injected failure.
@@ -126,42 +129,70 @@ is roughly thirty lines.
 
 ## 5. What is verified working
 
-Run `npm run target` in one terminal, then `npx tsx tests/surface.smoke.ts`.
+`npm test` — 71 tests, four files, no second terminal and no fixed ports. The
+target app runs in-process on an OS-assigned port, so a developer's own
+`npm run target` on :4173 cannot collide with a test run.
 
-- Target app: happy path returns Dana Whitfield's `$4,182.55`; unknown ID gives
-  "no member found"; malformed ID gives a *distinct* validation error;
-  restricted member returns 403; injected session-expiry fires and then
-  self-heals on the next request (faults carry a consumption budget, so
-  "transient" is genuinely expressible).
-- Perception: controls discovered across `navFrame` and `contentFrame`;
-  buttons and links resolve by role+name; **every input has `name=""` and is
-  reachable only via its adjacent label cell**; savings balance read back
-  correctly by locating the cell via its row context; password field flagged
-  sensitive with its value never captured; off-allowlist navigation denied
-  inside `act()`.
+- **Perception** (`tests/perception.test.ts`): controls discovered across
+  `navFrame` and `contentFrame`; buttons and links resolve by role+name;
+  **every input has `name=""` and is reachable only via its adjacent label
+  cell**; the savings balance is read back by locating the cell via its row
+  context; stale node ids are rejected rather than silently addressing a
+  detached element.
+- **Safety** (`tests/safety.test.ts`): off-allowlist navigation refused as a
+  typed value; a nav-frame link to an off-allowlist route is contained and
+  reverted; irreversible actions denied unattended and escalated when attended;
+  SSNs redacted out of observation text, node names and anchors before anything
+  can see them; the redacted cell marked sensitive and refused by `read`;
+  sensitive regions masked in the *first* screenshot of a screen; a typed
+  password never captured.
+- **Policy** (`tests/policy.unit.test.ts`): route-pattern boundaries, the
+  mode matrix for irreversible actions, and the redaction patterns — including
+  the concatenated-text case that a `\b`-anchored pattern misses.
+- **Artifact** (`tests/artifact.test.ts`): the reference capability validates;
+  referential integrity rejects undeclared params, absent overlay steps,
+  self-recovering capabilities, secret outputs and PII examples; path
+  canonicalisation round-trips; tenant binding remaps labels without mutating
+  the base and reports version drift; the catalog tells a calling agent which
+  outcomes are legitimate.
+
+Target app behaviour, exercised through the above: happy path returns Dana
+Whitfield's `$4,182.55`; unknown ID gives "no member found"; malformed ID gives
+a *distinct* validation error; restricted member returns 403; injected
+session-expiry fires and then self-heals on the next request (faults carry a
+consumption budget, so "transient" is genuinely expressible).
 
 ## 6. Next actions, in order
 
-1. `src/artifact/schema.ts` — Zod. Capability identity and version, app/vendor
-   identity, typed inputs with sensitivity markers, typed outputs, declared
-   business outcomes with detection predicates, risk class, ordered steps
-   (intent + action + `TargetDescriptor` ladder + checkpoint + recovery),
-   extraction rules, success condition, provenance, approval state.
-2. `src/llm/` — provider interface plus a `mock` provider that replays a
+1. `src/replay/` — build this *before* discovery. The reference artifact in
+   `tests/fixtures/readSavingsBalance.ts` is a complete, validated capability,
+   so replay can be built and tested end to end against it with no model and no
+   API key. Doing it in this order also means the discovery compiler has a
+   working consumer to target rather than a guess.
+   - `resolve.ts` — walk the `TargetDescriptor` ladder against an observation,
+     require a unique match, report which rank resolved.
+   - `checkpoint.ts` — evaluate the predicate algebra.
+   - `extract.ts` — apply `ExtractionRule` and transforms.
+   - `execute.ts` — the loop: bind tenant, validate inputs against `ParamSpec`,
+     step, checkpoint, recover, detect outcomes, assert success, emit
+     `ReplayResult`.
+2. `src/evidence/` — JSONL run log, screenshots, observation dumps, written
+   through the redaction boundary. Needed by both replay and discovery.
+3. `src/llm/` — provider interface plus a `mock` provider that replays a
    recorded transcript, so a reviewer with no key can still exercise discovery.
-3. `src/agent/loop.ts` — observe, compact for the model, decide via tool
+4. `src/agent/loop.ts` — observe, compact for the model, decide via tool
    calling, policy-check, act, append to trace. Stop on success, max steps,
    timeout, or dead-end.
-4. `src/agent/compile.ts` — trace to artifact. Drops exploratory dead ends,
-   promotes goal values to typed params, canonicalizes routes
-   (`/member/100245` -> `/member/:memberId`), builds target ladders, and makes
+5. `src/agent/compile.ts` — trace to artifact. Drops exploratory dead ends,
+   promotes goal values to typed params, canonicalizes routes (the helpers in
+   `src/artifact/canonical.ts` already exist), builds target ladders, and makes
    **one** out-of-loop model call to propose intents, parameter names, output
-   schema and candidate outcomes, validated against Zod. Authoring metadata
-   with a model is fine; deciding at replay time is not.
-5. `src/replay/` — the ladder resolver, checkpoint evaluator, error taxonomy,
-   and the four-way result contract.
+   schema and candidate outcomes, validated against the Zod schema. Authoring
+   metadata with a model is fine; deciding at replay time is not.
 6. `src/hitl/` — control state machine and operator console.
-7. README, REPORT, evidence, recording.
+7. `src/cli/` — `discover`, `replay`, `catalog`, `operator`. Note that
+   `package.json` already references these; they do not exist yet.
+8. README, REPORT, evidence, recording.
 
 ## 7. Environment notes (this machine)
 
@@ -184,6 +215,12 @@ These cost real time; they are recorded so they are not rediscovered.
   Symptom if this regresses: `ReferenceError: __name is not defined`.
 - **npm 11 blocks postinstall scripts.** `esbuild` (and so `tsx`) needs
   `npm install-scripts approve esbuild`.
+- **PowerShell here is old enough to reject `&&`.** Chain with `;` instead.
+  This is why `npm run target:b` passes `--tenant b --port 4174` as flags
+  rather than using a `VAR=x cmd` prefix, which would not be portable anyway.
+- **Zod is on v4** (upgraded from the 3.25 line, which ships both). Nothing
+  depended on v3 at the time, so this was free, and it gets us `z.toJSONSchema`
+  if the artifact envelope ever needs to publish its own schema.
 
 ## 8. Before submitting
 
