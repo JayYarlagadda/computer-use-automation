@@ -43,6 +43,12 @@ export interface EvidenceSink {
    * two disagree the disagreement is the bug.
    */
   observation(name: string, observation: Observation): Promise<string>;
+
+  /**
+   * Writes an arbitrary artefact of the run -- the compiled capability, the
+   * final result, the model transcript. Returns its path relative to `path`.
+   */
+  file(name: string, contents: string | Buffer): Promise<string>;
 }
 
 /** Used by tests and by callers that genuinely do not want a record. */
@@ -53,6 +59,9 @@ export const NULL_SINK: EvidenceSink = {
     return '';
   },
   async observation() {
+    return '';
+  },
+  async file() {
     return '';
   },
 };
