@@ -1,0 +1,17 @@
+node_modules/
+dist/
+*.log
+
+# Secrets: never commit real keys. See .env.example.
+.env
+.env.*
+!.env.example
+
+# Local scratch runs. Curated runs under evidence/ ARE committed on purpose.
+evidence/scratch/
+interventions/
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

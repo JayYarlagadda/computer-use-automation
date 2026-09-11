@@ -1,0 +1,40 @@
+{
+  "name": "computer-use-automation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LLM discovers a UI flow once; it is compiled into a typed capability artifact that replays deterministically with no model in the loop.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "target": "tsx targets/meridian/server.ts",
+    "discover": "tsx src/cli/index.ts discover",
+    "replay": "tsx src/cli/index.ts replay",
+    "catalog": "tsx src/cli/index.ts catalog",
+    "operator": "tsx src/cli/index.ts operator",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0",
+    "@google/genai": "^1.28.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "openai": "^6.9.0",
+    "playwright": "^1.56.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "tsx": "^4.20.7",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "protobufjs@7.6.6": true,
+    "@google/genai@1.52.0": true
+  }
+}
