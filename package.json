@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "set-key": "node scripts/set-key.mjs",
+    "env": "node scripts/env-status.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "verify": "npm run check:secrets && npm run typecheck && npm test",
     "prepare": "node scripts/install-hooks.mjs"
