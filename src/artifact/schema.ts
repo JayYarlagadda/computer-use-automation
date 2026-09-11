@@ -190,6 +190,19 @@ export const TargetStrategy = z.discriminatedUnion('kind', [
     rowText: z.string().optional(),
     sectionText: z.string().optional(),
     match: TextMatch.default('exact'),
+    /**
+     * A constraint on the control's *own* text, applied on top of the anchors.
+     *
+     * This exists because writing the real flow proved the anchors alone are
+     * not always enough. "The cell in the Savings row" matches four cells --
+     * the type, the account number, the balance and the status all share a row
+     * -- so the row identifies the region and something else has to identify
+     * the cell within it. A shape constraint is the right something: the
+     * balance is the currency-shaped cell in that row, which stays true when
+     * the amount changes, when a column is reordered, and when a different
+     * member has a different number of accounts. An ordinal would not.
+     */
+    namePattern: z.string().optional(),
   }),
 
   /**
@@ -387,10 +400,29 @@ export type RecoveryAction = z.infer<typeof RecoveryAction>;
 export const RecoveryRule = z.object({
   id: z.string().min(1),
   description: z.string().min(1),
-  /** Evaluated against the observation after a step's checkpoint failed. */
+  /**
+   * Evaluated against the current screen whenever a step cannot proceed --
+   * either its target did not resolve or its checkpoint did not hold. Both
+   * matter: a surprise interstitial and an expired session usually announce
+   * themselves as "the control I wanted is not there", not as a failed
+   * assertion, so a rule that only fired on checkpoint failure would miss the
+   * conditions it was written for.
+   */
   when: Checkpoint,
   then: RecoveryAction,
   maxAttempts: z.number().int().positive().default(1),
+  /**
+   * Resume from this step rather than retrying the one that failed.
+   *
+   * Needed because some recoveries destroy work already done. Re-authenticating
+   * after a session expiry returns a *fresh* application: the member number
+   * typed three steps ago is gone, so retrying just the failed step submits an
+   * empty form and the caller is told the member number was invalid -- a wrong
+   * answer produced by a successful recovery, which is the worst kind.
+   * Declaring the restart point keeps that decision in the reviewed artifact
+   * instead of hardcoded in the executor.
+   */
+  restartFrom: StepId.optional(),
 });
 export type RecoveryRule = z.infer<typeof RecoveryRule>;
 

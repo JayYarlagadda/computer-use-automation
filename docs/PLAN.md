@@ -115,7 +115,12 @@ is graded, and is intentionally unpolished.
 - [x] **Phase 3 — Artifact schema.** Commit `d662652`. Designed *before* the
       agent loop, so the loop targets the contract rather than the contract
       being reverse-engineered from whatever the loop emitted.
-- [ ] **Phase 4 — Discovery loop + compiler + real LLM run.** Needs an API key.
+- [x] **Phase 5 (brought forward) — Replay engine.** Resolver, checkpoint
+      evaluator, extraction, input binding, executor, four-way result contract.
+      Built before discovery because the hand-written reference artifact makes
+      the whole production path testable with no model and no API key, and it
+      gives the discovery compiler a working consumer to target.
+- [ ] **Phase 4 — Discovery loop + compiler + real LLM run.** Groq key.
 - [ ] **Phase 5 — Replay engine + error taxonomy.** Produces three evidence
       runs: success, business outcome, injected failure.
 - [ ] **Phase 6 — Human-in-the-loop control transfer.**

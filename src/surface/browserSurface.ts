@@ -42,6 +42,8 @@ export class BrowserSurface implements Surface {
   private lastObservation?: Observation;
   /** Timestamp of the last sign the page was still doing something. */
   private lastActivityAt = 0;
+  /** Requests started but not yet finished or failed. */
+  private inFlight = 0;
 
   private constructor(
     private readonly browser: Browser,
@@ -52,9 +54,23 @@ export class BrowserSurface implements Surface {
     const touch = () => {
       this.lastActivityAt = Date.now();
     };
-    page.on('request', touch);
-    page.on('requestfinished', touch);
-    page.on('requestfailed', touch);
+    // Outstanding requests are counted, not just timestamped. A response that
+    // takes three seconds emits one event at the start and one at the end, so
+    // an event-recency check alone sees a long quiet gap and concludes the page
+    // has settled -- in the middle of exactly the slow load it was meant to
+    // wait for.
+    page.on('request', () => {
+      this.inFlight += 1;
+      touch();
+    });
+    page.on('requestfinished', () => {
+      this.inFlight = Math.max(0, this.inFlight - 1);
+      touch();
+    });
+    page.on('requestfailed', () => {
+      this.inFlight = Math.max(0, this.inFlight - 1);
+      touch();
+    });
     page.on('framenavigated', touch);
   }
 
@@ -397,7 +413,7 @@ export class BrowserSurface implements Surface {
       }
     }
 
-    while (Date.now() < deadline && Date.now() - this.lastActivityAt < QUIET_MS) {
+    while (Date.now() < deadline && (this.inFlight > 0 || Date.now() - this.lastActivityAt < QUIET_MS)) {
       await delay(50);
     }
 

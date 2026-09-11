@@ -20,6 +20,7 @@ import {
   type Checkpoint,
   type RecoveryRule,
   type Step,
+  type TargetDescriptor,
   type ValueSpec,
 } from './schema.js';
 
@@ -160,6 +161,13 @@ function semanticIssues(a: CapabilityArtifact): ArtifactIssue[] {
     }
   });
 
+  forEachTarget(a, (target, path) => {
+    target.strategies.forEach((s, i) => {
+      if (s.kind === 'anchor' && s.namePattern) assertRegex(s.namePattern, `${path}.strategies[${i}].namePattern`, error);
+      if (s.kind === 'role-name' && s.match === 'regex') assertRegex(s.name, `${path}.strategies[${i}].name`, error);
+    });
+  });
+
   a.outputs.forEach((o, i) => {
     if (o.extract.kind === 'text-pattern') assertRegex(o.extract.pattern, `outputs[${i}].extract.pattern`, error);
   });
@@ -275,6 +283,36 @@ function forEachCheckpoint(a: CapabilityArtifact, visit: (cp: Checkpoint, path: 
   });
   a.outcomes.forEach((o, i) => walk(o.detect, `outcomes[${i}].detect`));
   a.recovery.forEach((r, i) => walk(r.when, `recovery[${i}].when`));
+}
+
+/** Visits every TargetDescriptor, wherever it is embedded. */
+function forEachTarget(a: CapabilityArtifact, visit: (target: TargetDescriptor, path: string) => void): void {
+  const fromCheckpoint = (cp: Checkpoint, path: string): void => {
+    if (cp.kind === 'node-present' || cp.kind === 'node-absent') visit(cp.target, `${path}.target`);
+    if (cp.kind === 'all' || cp.kind === 'any') cp.of.forEach((c, i) => fromCheckpoint(c, `${path}.of[${i}]`));
+    if (cp.kind === 'not') fromCheckpoint(cp.of, `${path}.of`);
+  };
+
+  a.steps.forEach((s, i) => {
+    if (s.target) visit(s.target, `steps[${i}].target`);
+    if (s.checkpoint) fromCheckpoint(s.checkpoint, `steps[${i}].checkpoint`);
+    s.recovery.forEach((r, j) => {
+      fromCheckpoint(r.when, `steps[${i}].recovery[${j}].when`);
+      if (r.then.kind === 'click') visit(r.then.target, `steps[${i}].recovery[${j}].then.target`);
+    });
+  });
+
+  a.recovery.forEach((r, i) => {
+    fromCheckpoint(r.when, `recovery[${i}].when`);
+    if (r.then.kind === 'click') visit(r.then.target, `recovery[${i}].then.target`);
+  });
+
+  a.outputs.forEach((o, i) => {
+    if (o.extract.kind === 'node-text') visit(o.extract.target, `outputs[${i}].extract.target`);
+  });
+
+  fromCheckpoint(a.successCheckpoint, 'successCheckpoint');
+  a.outcomes.forEach((o, i) => fromCheckpoint(o.detect, `outcomes[${i}].detect`));
 }
 
 function duplicates(values: string[]): string[] {

@@ -59,22 +59,22 @@ export function createMeridianApp(tenant: TenantConfig): MeridianApp {
   async function faultGate(req: Request, res: Response, next: NextFunction) {
     if (req.path.startsWith('/_admin') || req.path === '/login' || req.path === '/') return next();
 
-    const slow = faults.consume('slow');
+    const slow = faults.consume('slow', req.path);
     if (slow) await new Promise((r) => setTimeout(r, slow.delayMs ?? 4000));
 
-    if (faults.consume('app_error')) {
+    if (faults.consume('app_error', req.path)) {
       res.status(500).send(V.appErrorScreen(tenant));
       return;
     }
 
-    if (faults.consume('session_expired')) {
+    if (faults.consume('session_expired', req.path)) {
       const token = cookies(req).sid;
       if (token) sessions.delete(token);
       res.send(V.loginPage(tenant, 'Your session has expired. Please sign on again.'));
       return;
     }
 
-    if (faults.consume('interstitial')) {
+    if (faults.consume('interstitial', req.path)) {
       res.send(V.interstitialScreen(tenant, req.originalUrl));
       return;
     }
@@ -101,8 +101,13 @@ export function createMeridianApp(tenant: TenantConfig): MeridianApp {
   });
 
   app.post('/_admin/faults', express.json(), (req, res) => {
-    const { kind, count, delayMs } = req.body as { kind: FaultKind; count?: number; delayMs?: number };
-    faults.arm(kind, count ?? 1, delayMs);
+    const { kind, count, delayMs, onPath } = req.body as {
+      kind: FaultKind;
+      count?: number;
+      delayMs?: number;
+      onPath?: string;
+    };
+    faults.arm(kind, count ?? 1, { ...(delayMs !== undefined ? { delayMs } : {}), ...(onPath ? { onPath } : {}) });
     res.json({ ok: true, armed: faults.list() });
   });
 

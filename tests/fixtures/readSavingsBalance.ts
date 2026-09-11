@@ -62,14 +62,12 @@ export const readSavingsBalance: CapabilityArtifactInput = {
         target: {
           description: "the cell holding the member's name",
           framePath: ['contentFrame'],
-          strategies: [
-            { kind: 'anchor', role: 'cell', precedingText: 'Name', match: 'exact' },
-            { kind: 'structural', role: 'cell', sectionText: 'Member Detail', ordinalInRole: 6 },
-          ],
+          strategies: [{ kind: 'anchor', role: 'cell', precedingText: 'Name', match: 'exact' }],
           notes:
             'The name is a bare table cell with no accessible name of its own, so it is addressed ' +
-            'by the label cell to its left. Structural rank is a fallback only; it depends on cell ' +
-            'ordering and resolving there should be treated as drift.',
+            'by the label cell to its left. There is deliberately no structural fallback: an ' +
+            'ordinal would resolve to *some* cell on a changed screen and return whatever it held, ' +
+            'and a confidently wrong member name is worse than a failed lookup.',
         },
         transforms: ['trim'],
       },
@@ -83,15 +81,23 @@ export const readSavingsBalance: CapabilityArtifactInput = {
       extract: {
         kind: 'node-text',
         target: {
-          description: 'the balance cell in the Savings row of the accounts table',
+          description: 'the currency-shaped cell in the Savings row of the accounts table',
           framePath: ['contentFrame'],
           strategies: [
-            { kind: 'anchor', role: 'cell', rowText: 'Savings', match: 'contains' },
-            { kind: 'structural', role: 'cell', sectionText: 'Share Accounts', ordinalInRole: 22 },
+            {
+              kind: 'anchor',
+              role: 'cell',
+              rowText: 'Savings',
+              match: 'contains',
+              namePattern: '^\\$[\\d,]+\\.\\d{2}$',
+            },
           ],
           notes:
             'Row-scoped rather than positional: the accounts table has a variable number of rows ' +
-            'and savings is not always first. The anchor names the row, not its index.',
+            'and savings is not always first. The row alone is not enough -- type, account number, ' +
+            'balance and status all share it -- so the shape constraint picks the balance out of ' +
+            'the row. Shape survives the amount changing and the columns being reordered; an ' +
+            'ordinal survives neither.',
         },
         transforms: ['trim', 'strip-currency'],
       },
@@ -288,6 +294,10 @@ export const readSavingsBalance: CapabilityArtifactInput = {
       when: { kind: 'text-present', text: 'Your session has expired', match: 'contains' },
       then: { kind: 'run-capability', capabilityId: 'meridian.auth.sign-on', version: '1.0.0' },
       maxAttempts: 1,
+      // Signing on again returns a *fresh* application, so the member number
+      // typed earlier is gone. Resuming from the step that types it is the
+      // difference between recovering and confidently searching for nothing.
+      restartFrom: 'enter-member-id',
     },
     {
       id: 'retry-transient-app-error',

@@ -35,6 +35,20 @@ interface ArmedFault {
   remaining: number;
   /** Only used by 'slow'. */
   delayMs?: number;
+  /**
+   * Fire only on request paths containing this substring.
+   *
+   * Without it, every fault lands on the first authenticated request, which is
+   * the frameset -- so "the session expires while opening a member record"
+   * cannot be expressed, and those mid-flow conditions are the interesting
+   * ones. Scoping by path is how a fault reaches the step it is meant to test.
+   */
+  onPath?: string;
+}
+
+export interface ArmOptions {
+  delayMs?: number;
+  onPath?: string;
 }
 
 /**
@@ -45,8 +59,13 @@ interface ArmedFault {
 export class FaultBox {
   private readonly armed = new Map<FaultKind, ArmedFault>();
 
-  arm(kind: FaultKind, count = 1, delayMs?: number): void {
-    this.armed.set(kind, { kind, remaining: count, delayMs });
+  arm(kind: FaultKind, count = 1, opts: ArmOptions = {}): void {
+    this.armed.set(kind, {
+      kind,
+      remaining: count,
+      ...(opts.delayMs !== undefined ? { delayMs: opts.delayMs } : {}),
+      ...(opts.onPath !== undefined ? { onPath: opts.onPath } : {}),
+    });
   }
 
   clear(): void {
@@ -61,9 +80,11 @@ export class FaultBox {
    * Returns the fault if it should fire now, decrementing its budget.
    * Consuming on read is what makes transient faults self-healing.
    */
-  consume(kind: FaultKind): ArmedFault | undefined {
+  consume(kind: FaultKind, path = ''): ArmedFault | undefined {
     const f = this.armed.get(kind);
     if (!f || f.remaining <= 0) return undefined;
+    if (f.onPath && !path.includes(f.onPath)) return undefined;
+
     f.remaining -= 1;
     if (f.remaining <= 0) this.armed.delete(kind);
     return f;
