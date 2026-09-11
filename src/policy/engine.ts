@@ -94,7 +94,7 @@ export class PolicyEngine implements Policy {
   private readonly irreversible: RegExp[];
   private readonly redactions: RegExp[];
 
-  constructor(private readonly config: PolicyConfig = DEFAULT_POLICY) {
+  constructor(readonly config: PolicyConfig = DEFAULT_POLICY) {
     this.irreversible = config.irreversiblePatterns.map((p) => new RegExp(p, 'i'));
     this.redactions = config.redactPatterns.map((p) => new RegExp(p, 'g'));
   }

@@ -54,9 +54,15 @@ export interface UiNode {
   framePath: string[];
   bbox: BoundingBox;
   /**
-   * Raw evidence used to build durable locators at record time: nearby text,
-   * the row/column a cell sits in, ordinal position. Available to the locator
-   * compiler, never shown to the model.
+   * Evidence used to build durable locators at record time: nearby text, the
+   * row a cell sits in, ordinal position.
+   *
+   * The compiler is the main consumer. The prompt also surfaces a single
+   * anchor for controls whose `name` cannot identify them on its own, because
+   * on table-laid-out legacy screens most inputs have no accessible name at
+   * all and "the box to the right of Member ID" is the only handle a human has
+   * either. That is text a screen reader would announce, not markup, so it
+   * does not weaken the no-selectors rule this interface exists to enforce.
    */
   anchors: NodeAnchors;
 }
