@@ -30,6 +30,7 @@ import {
   digest,
   expandPath,
   parseArtifact,
+  pathOf,
   type BusinessOutcome,
   type CapabilityArtifact,
   type Checkpoint,
@@ -48,6 +49,7 @@ import type {
   StepReport,
 } from '../artifact/result.js';
 import { NULL_SINK, type EvidenceSink } from '../evidence/types.js';
+import { resumes, type Disposition } from '../hitl/types.js';
 import type { Action, Observation, Surface } from '../surface/types.js';
 import { describe as describeCheckpoint, evaluate, explain, summariseScreen } from './checkpoint.js';
 import { extractOutputs, type ExtractionContext } from './extract.js';
@@ -73,8 +75,24 @@ export interface ReplayOptions {
   evidence?: EvidenceSink;
   /** Handles `run-capability` recovery. Absent means that recovery is skipped. */
   runCapability?: (capabilityId: string, version?: string) => Promise<boolean>;
-  /** Raises an intervention. Absent means escalation reports ids only. */
-  escalate?: (request: EscalationRequest) => Promise<{ sessionId: string; interventionId: string }>;
+  /**
+   * Hands the run to a person and waits for them.
+   *
+   * Absent, or returning no disposition, and escalation is terminal exactly as
+   * it was before there was anywhere to escalate *to*: the result carries the
+   * ids and the run stops. Wired to a `SessionBroker`, the same hook blocks
+   * until the operator hands the session back, and the run continues from
+   * where it stopped.
+   */
+  escalate?: (request: EscalationRequest) => Promise<EscalationHandling>;
+  /**
+   * How many times one run may stop for a person before it gives up.
+   *
+   * A capability that needs a human at every step is not automation, and a
+   * resume path with no budget is a loop that parks a person in front of the
+   * same screen forever. Defaults to 2.
+   */
+  maxEscalations?: number;
   runId?: string;
   /** Overall budget. A run that cannot finish should stop, not hang. */
   timeoutMs?: number;
@@ -86,8 +104,21 @@ export interface EscalationRequest {
   reason: Escalation['reason'];
   message: string;
   stepId?: string;
+  /** What the stalled step was trying to achieve, so a person can finish it. */
+  intent?: string;
   observation?: Observation;
   screenshotPath?: string;
+  observationPath?: string;
+}
+
+/** What the escalation handler reports back once a person has dealt with it. */
+export interface EscalationHandling {
+  sessionId: string;
+  interventionId: string;
+  /** Absent means nobody resolved it and the run stops. */
+  disposition?: Disposition;
+  operator?: string;
+  note?: string;
 }
 
 export async function replay(options: ReplayOptions): Promise<ReplayResult> {
@@ -177,6 +208,7 @@ export async function replay(options: ReplayOptions): Promise<ReplayResult> {
   // the underlying condition keeps recurring, loop forever -- and a run that
   // never terminates is worse than one that fails, because nothing surfaces.
   let restartsLeft = 2;
+  let escalationsLeft = options.maxEscalations ?? 2;
 
   for (let i = 0; i < artifact.steps.length; i++) {
     const step = artifact.steps[i]!;
@@ -197,7 +229,20 @@ export async function replay(options: ReplayOptions): Promise<ReplayResult> {
       return await businessOutcome(context(), outcome.outcome, outcome.observation, pathTemplates);
     }
     if (outcome.kind === 'escalate') {
-      return await escalated(context(), outcome.reason, outcome.message, step.id, outcome.observation);
+      const handled = await handleEscalation(context(), outcome, step, escalationsLeft);
+      if (handled.kind === 'stop') return handled.result;
+
+      escalationsLeft -= 1;
+
+      // Re-run the step. -1 because the loop increment puts us back on it.
+      if (handled.kind === 'retry') {
+        i -= 1;
+        continue;
+      }
+
+      // Verified: a person did the work and the step's own condition now
+      // holds, so the flow carries on from the next step.
+      continue;
     }
     if (outcome.kind === 'failed') {
       return failed(context(), outcome.failure);
@@ -285,7 +330,23 @@ interface ReplayContext {
 type StepOutcome =
   | { kind: 'ok'; report: StepReport; observation: Observation }
   | { kind: 'business-outcome'; report: StepReport; outcome: BusinessOutcome; observation: Observation }
-  | { kind: 'escalate'; report: StepReport; reason: Escalation['reason']; message: string; observation: Observation }
+  | {
+      kind: 'escalate';
+      report: StepReport;
+      reason: Escalation['reason'];
+      message: string;
+      observation: Observation;
+      /**
+       * What to do if a person fixes it and hands back.
+       *
+       * `retry` means the step never ran -- its control could not be found, and
+       * clearing the blockage is all that was needed, so the automation does
+       * the step itself. `verify` means the action already happened, or the
+       * person performed it in our place, so the only honest thing left is to
+       * check the step's condition and carry on.
+       */
+      resume: 'retry' | 'verify';
+    }
   | { kind: 'restart'; report: StepReport; fromStepId: string }
   | { kind: 'failed'; report: StepReport; failure: Failure };
 
@@ -435,6 +496,10 @@ async function runStep(
           reason: 'RECOVERY_EXHAUSTED',
           message: recovered.escalate,
           observation,
+          // The action never happened -- we could not even find its control.
+          // Once a person has cleared whatever was in the way, the step is
+          // still ours to perform.
+          resume: 'retry',
         });
       }
       if (recovered.restartFrom) {
@@ -517,6 +582,11 @@ async function runStep(
       reason: 'APPROVAL_REQUIRED',
       message: result.refusal.reason,
       observation,
+      // An irreversible step is performed by the person who authorised it, in
+      // the live session. There is no path back here that lets the automation
+      // do it instead, which is the point -- so all that remains is to check
+      // that what they did had the effect the step declared.
+      resume: 'verify',
     });
   }
 
@@ -577,6 +647,10 @@ async function runStep(
       reason: 'RECOVERY_EXHAUSTED',
       message: recovered.escalate,
       observation,
+      // The action was performed and the screen is not what the artifact
+      // expected. Repeating it could double a submission, so a person puts the
+      // session right and we assert the condition rather than acting again.
+      resume: 'verify',
     });
   }
   if (recovered.restartFrom) {
@@ -825,14 +899,6 @@ async function capture(
   return out;
 }
 
-function pathOf(location: string): string {
-  try {
-    return new URL(location).pathname;
-  } catch {
-    return location;
-  }
-}
-
 function describeAction(action: Action, step: Step): string {
   // Never the typed text. A secret is obviously excluded, but an ordinary
   // parameter can be regulated too, so the log records the shape of the action
@@ -939,46 +1005,151 @@ async function businessOutcome(
   };
 }
 
-async function escalated(
+/**
+ * Hands the run to a person, and decides what is left of it afterwards.
+ *
+ * The three answers are `stop` (nobody resolved it, or they decided it must
+ * not proceed), `retry` (the blockage is cleared and the step is ours to
+ * perform), and `verified` (a person did the work and the step's own condition
+ * now holds).
+ *
+ * The last one carries the rule that makes a handback trustworthy: the
+ * executor re-evaluates the step's checkpoint against the screen the operator
+ * left behind. "They said they did it" is not evidence, and a capability that
+ * resumed on an operator's word would report success for work that never
+ * happened -- which in this domain is the same failure as doing the wrong
+ * thing, arrived at more politely.
+ */
+type EscalationHandled =
+  | { kind: 'stop'; result: ReplayResult }
+  | { kind: 'retry' }
+  | { kind: 'verified' };
+
+async function handleEscalation(
   ctx: ReplayContext,
-  reason: Escalation['reason'],
-  message: string,
-  stepId: string,
-  observation: Observation,
-): Promise<ReplayResult> {
-  const shot = await capture(ctx.evidence, ctx.options.surface, `${stepId}-escalation`, observation);
+  outcome: Extract<StepOutcome, { kind: 'escalate' }>,
+  step: Step,
+  budget: number,
+): Promise<EscalationHandled> {
+  const { options, evidence } = ctx;
+  const { reason, message } = outcome;
+
+  const shot = await capture(evidence, options.surface, `${step.id}-escalation`, outcome.observation);
 
   const request: EscalationRequest = {
     runId: ctx.runId,
     capabilityId: ctx.artifact.capability.id,
     reason,
     message,
-    stepId,
-    observation,
-    ...(shot.screenshotPath ? { screenshotPath: shot.screenshotPath } : {}),
+    stepId: step.id,
+    intent: step.intent,
+    observation: outcome.observation,
+    ...shot,
   };
 
-  const handled = (await ctx.options.escalate?.(request)) ?? {
+  const handled: EscalationHandling = (await options.escalate?.(request)) ?? {
     sessionId: `unbrokered-${ctx.runId}`,
     interventionId: randomUUID(),
   };
 
-  await ctx.evidence.event({
+  await evidence.event({
     at: new Date().toISOString(),
     kind: 'replay.escalated',
     runId: ctx.runId,
     reason,
     message,
-    stepId,
+    stepId: step.id,
     interventionId: handled.interventionId,
     sessionId: handled.sessionId,
+    disposition: handled.disposition ?? null,
+    operator: handled.operator ?? null,
   });
 
-  return {
-    ...envelope(ctx),
-    status: 'escalated',
-    escalation: { reason, message, stepId, ...handled },
-  };
+  const stop = (why: string): EscalationHandled => ({
+    kind: 'stop',
+    result: {
+      ...envelope(ctx),
+      status: 'escalated',
+      escalation: {
+        reason,
+        message: why,
+        stepId: step.id,
+        sessionId: handled.sessionId,
+        interventionId: handled.interventionId,
+      },
+    },
+  });
+
+  if (!handled.disposition || !resumes(handled.disposition)) {
+    return stop(message);
+  }
+
+  if (budget <= 0) {
+    return stop(
+      `${message} The run has already stopped for a person as many times as it is allowed to, so it ` +
+        'is not resuming again.',
+    );
+  }
+
+  if (outcome.resume === 'retry') {
+    outcome.report.status = 'recovered';
+    return { kind: 'retry' };
+  }
+
+  // ---- the operator says the step is done. Check. --------------------------
+
+  const observation = await observe(options.surface, false);
+  const checkCtx = { observation, path: pathOf(observation.location) };
+
+  // Outcomes first, exactly as everywhere else in this executor. A person who
+  // took over and found "no such member" has produced an answer, and reporting
+  // that as a broken capability would be the mistake the whole result contract
+  // is shaped to prevent.
+  const declared = detectOutcome(ctx.artifact.outcomes, checkCtx);
+  if (declared) {
+    outcome.report.status = 'recovered';
+    return {
+      kind: 'stop',
+      result: await businessOutcome(ctx, declared, observation, collectPathTemplates(ctx.artifact)),
+    };
+  }
+
+  if (step.checkpoint && !evaluate(step.checkpoint, checkCtx)) {
+    const failureShot = await capture(evidence, options.surface, `${step.id}-handback`, observation);
+    outcome.report.status = 'failed';
+    outcome.report.expected = explain(step.checkpoint, checkCtx);
+    outcome.report.observed = summariseScreen(checkCtx);
+
+    return {
+      kind: 'stop',
+      result: failed(ctx, {
+        code: 'CHECKPOINT_FAILED',
+        message:
+          `An operator returned step "${step.id}" (${step.intent}) as complete, but the condition ` +
+          'the artifact declares for it still does not hold.',
+        stepId: step.id,
+        expected: describeCheckpoint(step.checkpoint),
+        observed: summariseScreen(checkCtx),
+        ...failureShot,
+      }),
+    };
+  }
+
+  if (!step.checkpoint) {
+    // Nothing to check against. Said out loud in the log rather than passed
+    // over, because "resumed unverified" is the one case where the guarantee
+    // above does not apply and a reviewer should know which steps those were.
+    await evidence.event({
+      at: new Date().toISOString(),
+      kind: 'replay.resumed-unverified',
+      runId: ctx.runId,
+      stepId: step.id,
+      interventionId: handled.interventionId,
+    });
+  }
+
+  outcome.report.status = 'recovered';
+  return { kind: 'verified' };
 }
 
 function preflightFailure(

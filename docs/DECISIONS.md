@@ -164,6 +164,16 @@ actions are captured by page-level instrumentation into the same evidence
 stream. On resume the executor re-verifies the step's precondition rather than
 trusting that the human did what was asked.
 
+One narrowing fell out of building it. There is no "approved — now you do it"
+disposition. An irreversible step that needed a person is performed *by* that
+person, in the live session, and the executor then checks the step's
+checkpoint. The alternative is a grant that `act()` honours, which reintroduces
+the one thing the choke point exists to prevent: a path by which automation
+performs an irreversible action with no human at the controls. A bypass that
+exists can be reached by accident. Requiring the approver to also be the actor
+costs a click and buys attribution — the money movement is traceable to a named
+operator rather than to a run that was told it could proceed.
+
 **What would invalidate this.** Nothing here; the acknowledged gap is remote
 operation. A human on another machine needs a co-browse transport (CDP
 screencast or WebRTC). That is a transport swap beneath the same control-state
