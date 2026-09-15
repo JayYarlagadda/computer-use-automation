@@ -109,9 +109,9 @@ export function renderObservation(observation: Observation, turn: number, maxTur
   const lines = shown.map((node) => {
     const ambiguous = !node.name || (nameCounts.get(`${node.role}\u0000${node.name}`) ?? 0) > 1;
     return [
-      `  ${node.nodeId.padEnd(5)}`,
-      node.role.padEnd(9),
-      `"${clip(node.name, MAX_NAME_CHARS)}"`,
+      `  ${node.nodeId.padEnd(8)} `,
+      node.role.padEnd(10),
+      ` "${clip(node.name, MAX_NAME_CHARS)}"`,
       node.value !== undefined ? ` value="${clip(node.value, 40)}"` : '',
       node.sensitive ? ' [sensitive]' : '',
       node.enabled ? '' : ' [disabled]',

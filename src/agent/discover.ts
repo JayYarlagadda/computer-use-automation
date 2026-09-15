@@ -195,7 +195,12 @@ export async function discover(options: DiscoveryOptions): Promise<DiscoveryRun>
       const previous = steps.at(-1);
       if (previous && !previous.observationAfter) {
         previous.observationAfter = observation;
-        previous.noChange = digest(previous.observationBefore) === digest(observation);
+        // A type/select into a sensitive field cannot change the digest:
+        // the value is never captured. Counting that as "no change" would
+        // abort a sign-on after three password keystrokes.
+        const looksSame = digest(previous.observationBefore) === digest(observation);
+        const silent = previous.action.type === 'type' || previous.action.type === 'select';
+        previous.noChange = looksSame && !silent;
         if (previous.noChange) {
           stalledStreak += 1;
           if (stalledStreak >= cfg.maxStalledSteps) {

@@ -32,6 +32,19 @@ export interface BrowserSurfaceOptions {
   defaultTimeoutMs?: number;
   /** Upper bound on how long a screen is given to stop changing. */
   settleTimeoutMs?: number;
+  /**
+   * Origin that a path-only navigation is resolved against before anything
+   * else happens to it.
+   *
+   * The agent's `navigate` tool takes a path and never a URL, so that the
+   * model is structurally incapable of naming a destination outside the
+   * application rather than merely being refused one. That guarantee needs
+   * somewhere for the origin to come from, and it is here: the deployment
+   * knows which host it is driving, the model does not, and the resolved URL
+   * is what the policy layer then checks. Absent, the current page's origin is
+   * used, which covers every navigation after the first.
+   */
+  baseUrl?: string;
 }
 
 export class BrowserSurface implements Surface {
@@ -217,7 +230,13 @@ export class BrowserSurface implements Surface {
     return this.lastObservation?.nodes.find((n) => n.nodeId === nodeId);
   }
 
-  async act(action: Action): Promise<ActResult> {
+  async act(request: Action): Promise<ActResult> {
+    // Resolved before the policy check, not after, so that what is checked and
+    // what is performed are the same location. Checking a path and then
+    // navigating to a URL built from it would be a gap between the guard and
+    // the act, which is the one shape of bug a choke point must not have.
+    const action = this.resolveLocation(request);
+
     const node = 'nodeId' in action ? this.nodeFor(action.nodeId) : undefined;
     const before = this.frameLocations();
 
@@ -252,6 +271,39 @@ export class BrowserSurface implements Surface {
     // --- the choke point, part two: consequence ----------------------------
     const containment = await this.contain(before);
     return containment ?? result;
+  }
+
+  /**
+   * Gives a path-only navigation an origin, from the deployment rather than
+   * from the model.
+   *
+   * Anything already absolute is left exactly as it is, including a location
+   * pointing somewhere hostile -- resolution is not a safety check and must
+   * not quietly rewrite a destination into a permitted one. Making the
+   * off-allowlist request visible to the policy layer is the whole point; it
+   * is refused a few lines later, by name, and the refusal reaches evidence.
+   */
+  private resolveLocation(action: Action): Action {
+    if (action.type !== 'navigate') return action;
+
+    try {
+      new URL(action.location);
+      return action;
+    } catch {
+      // Not absolute, so it needs a base.
+    }
+
+    const current = this.page.url();
+    const base = /^https?:/i.test(current) ? current : this.opts.baseUrl;
+    if (!base) return action;
+
+    try {
+      return { ...action, location: new URL(action.location, base).toString() };
+    } catch {
+      // Unresolvable. Left alone so the policy layer reports it as the
+      // unparseable location it is.
+      return action;
+    }
   }
 
   /** Where every frame currently sits, keyed by frame path. */

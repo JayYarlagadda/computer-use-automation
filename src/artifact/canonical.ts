@@ -41,6 +41,22 @@ export function canonicalisePath(path: string, values: Record<string, string>): 
     .join('/');
 }
 
+/**
+ * The path portion of a location, which is the only part templates describe.
+ *
+ * A surface reports where it is in whatever form is natural to it -- a URL for
+ * a browser, a window title for a desktop app. Origins are a tenant's property
+ * and never belong in an artifact, so everything downstream compares paths.
+ * A location that is not a URL is already a path and is returned unchanged.
+ */
+export function pathOf(location: string): string {
+  try {
+    return new URL(location).pathname;
+  } catch {
+    return location;
+  }
+}
+
 /** `/member/{memberId}` + `{memberId: '100245'}` -> `/member/100245`. */
 export function expandPath(template: string, values: Record<string, string>): string {
   return template.replace(/\{([^}]+)\}/g, (_, name: string) => {

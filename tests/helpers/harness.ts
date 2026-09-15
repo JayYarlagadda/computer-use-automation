@@ -32,6 +32,8 @@ export async function launchHarness(
     headless: true,
     policy: opts.policy ?? policyFor(target.url),
     mode: opts.mode ?? 'discovery',
+    // The agent's navigate tool takes a path; this is where its origin comes from.
+    baseUrl: target.url,
     onPolicyDecision: (action, decision) => decisions.push({ action, decision }),
   });
 
