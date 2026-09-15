@@ -1,0 +1,151 @@
+{
+  "provider": "Groq",
+  "model": "openai/gpt-oss-120b",
+  "promptVersion": "discovery/1",
+  "turns": [
+    {
+      "turn": 1,
+      "response": {
+        "text": "",
+        "toolCalls": [
+          {
+            "id": "fc_bc739d04-5b4f-49ac-b499-af2158a1d0c1",
+            "name": "type_text",
+            "arguments": {
+              "nodeId": "f0n3",
+              "text": "operator",
+              "why": "Enter operator ID to sign on"
+            }
+          }
+        ],
+        "finishReason": "tool_calls",
+        "usage": {
+          "promptTokens": 1745,
+          "completionTokens": 129,
+          "totalTokens": 1874
+        }
+      }
+    },
+    {
+      "turn": 2,
+      "response": {
+        "text": "",
+        "toolCalls": [
+          {
+            "id": "fc_f96963f0-d0fc-4389-a8db-a8a4ec4abcda",
+            "name": "type_text",
+            "arguments": {
+              "nodeId": "f0n5",
+              "text": "[secret:MERIDIAN_OPERATOR_PASSWORD]",
+              "why": "Enter password to sign on"
+            }
+          }
+        ],
+        "finishReason": "tool_calls",
+        "usage": {
+          "promptTokens": 2012,
+          "completionTokens": 57,
+          "totalTokens": 2069
+        }
+      }
+    },
+    {
+      "turn": 3,
+      "response": {
+        "text": "",
+        "toolCalls": [
+          {
+            "id": "fc_180b47c8-2979-4ecf-9787-a96d3bd7096e",
+            "name": "click",
+            "arguments": {
+              "nodeId": "f0n6",
+              "why": "Submit login to access application"
+            }
+          }
+        ],
+        "finishReason": "tool_calls",
+        "usage": {
+          "promptTokens": 2280,
+          "completionTokens": 53,
+          "totalTokens": 2333
+        }
+      }
+    },
+    {
+      "turn": 4,
+      "response": {
+        "text": "",
+        "toolCalls": [
+          {
+            "id": "fc_d7b2b0ec-e61b-43aa-ab13-231ad6e60a93",
+            "name": "type_text",
+            "arguments": {
+              "nodeId": "f2n3",
+              "text": "100245",
+              "why": "Enter member ID to search for member"
+            }
+          }
+        ],
+        "finishReason": "tool_calls",
+        "usage": {
+          "promptTokens": 2827,
+          "completionTokens": 107,
+          "totalTokens": 2934
+        }
+      }
+    },
+    {
+      "turn": 5,
+      "response": {
+        "text": "",
+        "toolCalls": [
+          {
+            "id": "fc_d1a88835-0605-4541-89f3-89e624c1887a",
+            "name": "click",
+            "arguments": {
+              "nodeId": "f2n7",
+              "why": "Execute member search to view member details"
+            }
+          }
+        ],
+        "finishReason": "tool_calls",
+        "usage": {
+          "promptTokens": 3391,
+          "completionTokens": 74,
+          "totalTokens": 3465
+        }
+      }
+    },
+    {
+      "turn": 6,
+      "response": {
+        "text": "",
+        "toolCalls": [
+          {
+            "id": "fc_7394856a-8587-4bcf-9479-6d8f2376ef76",
+            "name": "finish_success",
+            "arguments": {
+              "outputs": [
+                {
+                  "description": "Current savings balance for member 100245",
+                  "name": "savingsBalance",
+                  "nodeId": "f2n21",
+                  "sensitivity": "restricted",
+                  "type": "currency"
+                }
+              ],
+              "successText": "Member Detail",
+              "summary": "Retrieved the savings account balance for member 100245"
+            }
+          }
+        ],
+        "finishReason": "tool_calls",
+        "usage": {
+          "promptTokens": 4460,
+          "completionTokens": 225,
+          "totalTokens": 4685
+        }
+      }
+    }
+  ]
+}

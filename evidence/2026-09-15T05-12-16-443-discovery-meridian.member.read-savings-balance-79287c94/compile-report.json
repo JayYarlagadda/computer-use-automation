@@ -1,0 +1,174 @@
+{
+  "stepsExplored": 5,
+  "stepsKept": 5,
+  "dropped": [],
+  "locators": [
+    {
+      "stepId": "1-enter-operator-id-to-sign-on",
+      "rungs": [
+        {
+          "kind": "role-name",
+          "summary": "role+name on textbox",
+          "accepted": false,
+          "reason": "the control has no accessible name at all"
+        },
+        {
+          "kind": "anchor",
+          "summary": "anchor: textbox labelled \"Operator ID\"",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "anchor",
+          "summary": "anchor: textbox in the \"Operator\" row",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "structural",
+          "summary": "structural: textbox #0 under \"Operator Sign On\"",
+          "accepted": true,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "stepId": "2-enter-password-to-sign-on",
+      "rungs": [
+        {
+          "kind": "role-name",
+          "summary": "role+name on textbox",
+          "accepted": false,
+          "reason": "the control has no accessible name at all"
+        },
+        {
+          "kind": "anchor",
+          "summary": "anchor: textbox labelled \"Password\"",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "anchor",
+          "summary": "anchor: textbox in the \"Password\" row",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "structural",
+          "summary": "structural: textbox #1 under \"Operator Sign On\"",
+          "accepted": true,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "stepId": "3-submit-login-to-access-application",
+      "rungs": [
+        {
+          "kind": "role-name",
+          "summary": "role+name \"Sign On\"",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "anchor",
+          "summary": "anchor: button under \"Operator Sign On\" matching ^Sign On$",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "structural",
+          "summary": "structural: button #0 under \"Operator Sign On\"",
+          "accepted": true,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "stepId": "4-enter-member-id-to-search-for",
+      "rungs": [
+        {
+          "kind": "role-name",
+          "summary": "role+name on textbox",
+          "accepted": false,
+          "reason": "the control has no accessible name at all"
+        },
+        {
+          "kind": "anchor",
+          "summary": "anchor: textbox labelled \"Member ID\"",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "anchor",
+          "summary": "anchor: textbox in the \"Member\" row",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "structural",
+          "summary": "structural: textbox #0 under \"Member Search\"",
+          "accepted": true,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "stepId": "5-execute-member-search-to-view-member",
+      "rungs": [
+        {
+          "kind": "role-name",
+          "summary": "role+name \"Search\"",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "anchor",
+          "summary": "anchor: button under \"Member Search\" matching ^Search$",
+          "accepted": true,
+          "reason": ""
+        },
+        {
+          "kind": "structural",
+          "summary": "structural: button #0 under \"Member Search\"",
+          "accepted": true,
+          "reason": ""
+        }
+      ]
+    }
+  ],
+  "outcomes": [
+    {
+      "code": "MEMBER_NOT_FOUND",
+      "accepted": true,
+      "reason": ""
+    },
+    {
+      "code": "MEMBER_INACTIVE",
+      "accepted": true,
+      "reason": ""
+    },
+    {
+      "code": "NO_SAVINGS_ACCOUNT",
+      "accepted": true,
+      "reason": ""
+    },
+    {
+      "code": "ACCOUNT_CLOSED",
+      "accepted": true,
+      "reason": ""
+    },
+    {
+      "code": "INVALID_MEMBER_ID_FORMAT",
+      "accepted": true,
+      "reason": ""
+    }
+  ],
+  "issues": [
+    {
+      "path": "outputs[0]",
+      "message": "Output \"savingsBalance\" has a single locator strategy and no fallback.",
+      "severity": "warning"
+    }
+  ]
+}

@@ -1,0 +1,436 @@
+{
+  "observedAt": "2026-09-15T05:12:19.839Z",
+  "location": "http://127.0.0.1:4173/app",
+  "title": "CoreBank Servicing",
+  "nodes": [
+    {
+      "nodeId": "f1n0",
+      "role": "cell",
+      "name": "Servicing",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Servicing",
+        "rowText": "Servicing",
+        "ordinalInRole": 0,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n1",
+      "role": "cell",
+      "name": "Member Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 31,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Member Search",
+        "rowText": "Member Search",
+        "sectionText": "Servicing",
+        "ordinalInRole": 1,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n2",
+      "role": "link",
+      "name": "Member Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 37,
+        "width": 125.90625,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Member Search",
+        "rowText": "Member Search",
+        "sectionText": "Servicing",
+        "ordinalInRole": 0,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n3",
+      "role": "cell",
+      "name": "Transaction History",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 62,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Transaction History",
+        "rowText": "Transaction History",
+        "sectionText": "Servicing",
+        "ordinalInRole": 2,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n4",
+      "role": "link",
+      "name": "Transaction History",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 68,
+        "width": 154.078125,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Transaction History",
+        "rowText": "Transaction History",
+        "sectionText": "Servicing",
+        "ordinalInRole": 1,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n5",
+      "role": "cell",
+      "name": "Administration",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 93,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Administration",
+        "rowText": "Administration",
+        "sectionText": "Servicing",
+        "ordinalInRole": 3,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n6",
+      "role": "link",
+      "name": "Administration",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 99,
+        "width": 116.703125,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Administration",
+        "rowText": "Administration",
+        "sectionText": "Servicing",
+        "ordinalInRole": 2,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n7",
+      "role": "cell",
+      "name": "Sign Off",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 124,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Sign Off",
+        "rowText": "Sign Off",
+        "sectionText": "Servicing",
+        "ordinalInRole": 4,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n8",
+      "role": "link",
+      "name": "Sign Off",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 130,
+        "width": 64.890625,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Sign Off",
+        "rowText": "Sign Off",
+        "sectionText": "Servicing",
+        "ordinalInRole": 3,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n0",
+      "role": "cell",
+      "name": "Meridian Credit Union CoreBank Servicing v7.2.11",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 1099,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Meridian Credit Union CoreBank Servicing v7.2.11",
+        "rowText": "Meridian Credit Union CoreBank Servicing v7.2.11",
+        "ordinalInRole": 0,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n1",
+      "role": "cell",
+      "name": "Member Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 42,
+        "width": 288.59375,
+        "height": 37
+      },
+      "anchors": {
+        "precedingText": "Member Search",
+        "rowText": "Member Search",
+        "ordinalInRole": 1,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n2",
+      "role": "cell",
+      "name": "Member ID",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 79,
+        "width": 107.59375,
+        "height": 39
+      },
+      "anchors": {
+        "precedingText": "Member ID",
+        "rowText": "Member ID",
+        "sectionText": "Member Search",
+        "ordinalInRole": 2,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n3",
+      "role": "textbox",
+      "name": "",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 127.59375,
+        "y": 88,
+        "width": 163,
+        "height": 21
+      },
+      "anchors": {
+        "precedingText": "Member ID",
+        "rowText": "Member ID",
+        "sectionText": "Member Search",
+        "ordinalInRole": 0,
+        "debugTag": "input"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n4",
+      "role": "cell",
+      "name": "Branch",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 118,
+        "width": 107.59375,
+        "height": 37
+      },
+      "anchors": {
+        "precedingText": "Branch",
+        "rowText": "Branch All BranchesRiversideNorthgateWestfield",
+        "sectionText": "Member Search",
+        "ordinalInRole": 3,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n5",
+      "role": "cell",
+      "name": "All BranchesRiversideNorthgateWestfield",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 118.59375,
+        "y": 118,
+        "width": 181,
+        "height": 37
+      },
+      "anchors": {
+        "precedingText": "Branch",
+        "rowText": "Branch All BranchesRiversideNorthgateWestfield",
+        "sectionText": "Member Search",
+        "ordinalInRole": 4,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n6",
+      "role": "combobox",
+      "name": "",
+      "value": "All Branches",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 127.59375,
+        "y": 127,
+        "width": 97,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Branch",
+        "rowText": "Branch All BranchesRiversideNorthgateWestfield",
+        "sectionText": "Member Search",
+        "ordinalInRole": 0,
+        "debugTag": "select"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n7",
+      "role": "button",
+      "name": "Search",
+      "value": "Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 127.59375,
+        "y": 165,
+        "width": 58.25,
+        "height": 21
+      },
+      "anchors": {
+        "sectionText": "Member Search",
+        "ordinalInRole": 0,
+        "debugTag": "input"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n8",
+      "role": "button",
+      "name": "Clear",
+      "value": "Clear",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 191.46875,
+        "y": 165,
+        "width": 47.859375,
+        "height": 21
+      },
+      "anchors": {
+        "sectionText": "Member Search",
+        "ordinalInRole": 1,
+        "debugTag": "input"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    }
+  ],
+  "text": "Servicing\nMember Search\nTransaction History\nAdministration\nSign Off\nMeridian Credit Union   CoreBank Servicing v7.2.11\nMember Search\nMember ID \nBranch \nAll Branches\nRiverside\nNorthgate\nWestfield\n\n  \n\nEnter the 6-digit member number."
+}

@@ -31,7 +31,7 @@
 import { randomUUID } from 'node:crypto';
 import type { EvidenceSink } from '../evidence/types.js';
 import { NULL_SINK } from '../evidence/types.js';
-import type { LlmMessage, LlmProvider, LlmUsage } from '../llm/types.js';
+import type { LlmMessage, LlmProvider, LlmUsage, ToolCall } from '../llm/types.js';
 import { LlmError } from '../llm/types.js';
 import type { Policy } from '../policy/types.js';
 import type { Action, Observation, Surface } from '../surface/types.js';
@@ -50,6 +50,12 @@ export interface DiscoveryOptions {
   evidence?: EvidenceSink;
   /** Shown to the model so it does not waste turns probing the allowlist. */
   allowedRoutes?: string[];
+  /**
+   * Named credentials the runtime can type. Values never reach the model, the
+   * trace, or the log -- only names do. The compiler turns a `type_secret`
+   * step into `{ from: 'secret', ref }`.
+   */
+  secrets?: Record<string, string>;
   maxTurns?: number;
   budgetMs?: number;
   /** Refusals before the run is handed to a human. */
@@ -91,6 +97,7 @@ export async function discover(options: DiscoveryOptions): Promise<DiscoveryRun>
         inputs,
         allowedRoutes: options.allowedRoutes ?? ['(the whole application)'],
         maxTurns: cfg.maxTurns,
+        secretNames: Object.keys(options.secrets ?? {}),
       }),
     },
   ];
@@ -253,7 +260,10 @@ export async function discover(options: DiscoveryOptions): Promise<DiscoveryRun>
         turn,
         response: {
           text: response.text,
-          toolCalls: response.toolCalls,
+          toolCalls: response.toolCalls.map((c) => ({
+            ...c,
+            arguments: sanitiseArgs(c, policy, options.secrets ?? {}),
+          })),
           finishReason: response.finishReason,
           usage: response.usage,
         },
@@ -266,7 +276,9 @@ export async function discover(options: DiscoveryOptions): Promise<DiscoveryRun>
         finishReason: response.finishReason,
         usage: response.usage,
         text: policy.redact(response.text),
-        tool: call ? { name: call.name, arguments: redactArgs(policy, call.arguments) } : null,
+        tool: call
+          ? { name: call.name, arguments: sanitiseArgs(call, policy, options.secrets ?? {}) }
+          : null,
       });
 
       if (!call) {
@@ -340,20 +352,66 @@ export async function discover(options: DiscoveryOptions): Promise<DiscoveryRun>
       }
 
       // --- act ---------------------------------------------------------------
+      let toPerform = decision.action;
+      if (decision.secretRef) {
+        const value = options.secrets?.[decision.secretRef];
+        if (!value) {
+          invalidStreak += 1;
+          const available = Object.keys(options.secrets ?? {});
+          const message =
+            `There is no credential named "${decision.secretRef}". ` +
+            (available.length
+              ? `Available: ${available.join(', ')}.`
+              : 'No credentials are configured for this run.');
+          await evidence.event({
+            at: new Date().toISOString(),
+            kind: 'decision.rejected',
+            turn,
+            tool: call.name,
+            reason: message,
+          });
+          messages.push({
+            role: 'tool',
+            toolCallId: call.id,
+            name: call.name,
+            content: message,
+          });
+          if (invalidStreak >= cfg.maxInvalid) {
+            return complete(
+              fail('MODEL_INCOHERENT', `${invalidStreak} unusable tool calls in a row. Last: ${message}`),
+            );
+          }
+          continue;
+        }
+        if (decision.action.type !== 'type') {
+          return complete(fail('SURFACE_ERROR', 'type_secret produced a non-type action.'));
+        }
+        toPerform = { type: 'type', nodeId: decision.action.nodeId, text: value, secret: true };
+      }
+
       const step: TraceStep = {
         index: steps.length,
         turn,
         why: decision.why,
-        action: decision.action,
+        // The value never lands in the trace. The compiler reads `secretRef`.
+        action: decision.secretRef
+          ? {
+              type: 'type',
+              nodeId: decision.action.type === 'type' ? decision.action.nodeId : '',
+              text: '',
+              secret: true,
+            }
+          : decision.action,
         node: decision.node,
         observationBefore: observation,
         ok: false,
+        ...(decision.secretRef ? { secretRef: decision.secretRef } : {}),
       };
       steps.push(step);
 
       let result;
       try {
-        result = await surface.act(decision.action);
+        result = await surface.act(toPerform);
       } catch (error) {
         return complete(fail('SURFACE_ERROR', `Action failed hard: ${describeError(error)}`));
       }
@@ -367,7 +425,9 @@ export async function discover(options: DiscoveryOptions): Promise<DiscoveryRun>
         kind: 'action',
         turn,
         why: decision.why,
-        action: describeAction(decision.action, policy),
+        action: decision.secretRef
+          ? `type secret ${decision.secretRef} into ${decision.action.type === 'type' ? decision.action.nodeId : '?'}`
+          : describeAction(decision.action, policy),
         target: decision.node
           ? { role: decision.node.role, name: policy.redact(decision.node.name) }
           : undefined,
@@ -472,6 +532,28 @@ function describeAction(action: Action, policy: Policy): string {
 
 function redactArgs(policy: Policy, args: Record<string, unknown>): Record<string, unknown> {
   return JSON.parse(policy.redact(JSON.stringify(args))) as Record<string, unknown>;
+}
+
+/**
+ * What is allowed to reach the transcript and the JSONL log.
+ *
+ * Pattern redaction catches SSNs and card numbers. It does not catch a
+ * password, because a password has no shape. So any typed text that matches a
+ * configured secret is replaced by the secret's name, and `type_secret`
+ * arguments (already a name) pass through. Everything else still goes through
+ * the pattern redactor.
+ */
+function sanitiseArgs(
+  call: ToolCall,
+  policy: Policy,
+  secrets: Record<string, string>,
+): Record<string, unknown> {
+  const args = redactArgs(policy, call.arguments);
+  if (typeof args.text !== 'string') return args;
+
+  const match = Object.entries(secrets).find(([, value]) => value === args.text);
+  if (match) return { ...args, text: `[secret:${match[0]}]` };
+  return args;
 }
 
 function describeError(error: unknown): string {

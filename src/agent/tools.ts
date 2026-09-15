@@ -22,6 +22,20 @@
  * returns information the model was just given -- and each extra tool measurably
  * costs accuracy on the choice that matters. The surface keeps `read` because
  * replay's extraction step needs it.
+ *
+ * And `type_secret` takes the *name* of a credential, never its value. This is
+ * the tool that lets an agent sign on to something without ever being shown a
+ * password. It is worth being clear about what that buys, because the first
+ * real discovery run against this target proved the point the hard way: the
+ * mock prints its demo credentials on the sign-on screen, the model duly read
+ * them and called `type_text` with the password as an argument, and the
+ * password was then in the run log, in the recorded transcript and in the run
+ * summary -- three files a public repository would have carried. A prompt rule
+ * saying "never type a password" did not prevent any of it, because the model
+ * was being helpful rather than disobedient. Removing the value from the
+ * model's vocabulary does prevent it, in the same way and for the same reason
+ * that `navigate` takes a path: the safest request is the one that cannot be
+ * expressed.
  */
 
 import { z } from 'zod';
@@ -40,7 +54,20 @@ export interface DeclaredOutput {
 }
 
 export type Decision =
-  | { kind: 'act'; action: Action; why: string; node?: UiNode }
+  | {
+      kind: 'act';
+      action: Action;
+      why: string;
+      node?: UiNode;
+      /**
+       * Set when the model asked to type a credential by name. The action's
+       * `text` is empty here -- interpretation has no business holding a
+       * credential -- and the loop substitutes the value on its way to the
+       * surface. What reaches the trace, and therefore the compiler, is the
+       * reference.
+       */
+      secretRef?: string;
+    }
   | { kind: 'finish'; summary: string; successText: string; outputs: DeclaredOutput[] }
   | { kind: 'outcome'; code: string; title: string; description: string; evidenceText: string }
   | { kind: 'escalate'; reason: string }
@@ -57,6 +84,7 @@ const why = z.string().min(1).describe('One sentence: why this action advances t
 const Args = {
   click: z.object({ nodeId: z.string().min(1), why }),
   type_text: z.object({ nodeId: z.string().min(1), text: z.string(), why }),
+  type_secret: z.object({ nodeId: z.string().min(1), secretName: z.string().min(1), why }),
   select_option: z.object({ nodeId: z.string().min(1), option: z.string().min(1), why }),
   press_key: z.object({ key: z.string().min(1), why }),
   navigate: z.object({ path: z.string().min(1), why }),
@@ -109,10 +137,25 @@ export const DISCOVERY_TOOLS: ToolSchema[] = [
     name: 'type_text',
     description:
       'Type into a text field. Replaces whatever the field currently contains. ' +
-      'Use one of the goal inputs verbatim when the field is asking for it.',
+      'Use one of the goal inputs verbatim when the field is asking for it. ' +
+      'Never use this for a password, PIN, or other credential -- call type_secret instead.',
     parameters: schema(
       { nodeId: NODE_ID, text: { type: 'string', description: 'Exact text to type.' }, why: WHY },
       ['nodeId', 'text', 'why'],
+    ),
+  },
+  {
+    name: 'type_secret',
+    description:
+      'Type a named credential into a field. Pass the credential NAME, never its value. ' +
+      'The runtime substitutes the value; it never appears in the prompt, the trace, or the log.',
+    parameters: schema(
+      {
+        nodeId: NODE_ID,
+        secretName: { type: 'string', description: 'Name of a configured credential, e.g. MERIDIAN_OPERATOR_PASSWORD.' },
+        why: WHY,
+      },
+      ['nodeId', 'secretName', 'why'],
     ),
   },
   {
@@ -262,11 +305,33 @@ export function interpret(call: ToolCall, observation: Observation): Decision {
       if (!args.success) return badArgs(call.name, args.error);
       const node = needNode(args.data.nodeId);
       if (typeof node === 'string') return { kind: 'invalid', message: node };
+      if (node.sensitive) {
+        return {
+          kind: 'invalid',
+          message:
+            `Node "${node.nodeId}" is marked sensitive. Do not pass a value into it. ` +
+            'Call type_secret with the credential name instead.',
+        };
+      }
       return {
         kind: 'act',
         action: { type: 'type', nodeId: node.nodeId, text: args.data.text },
         why: args.data.why,
         node,
+      };
+    }
+
+    case 'type_secret': {
+      const args = Args.type_secret.safeParse(call.arguments);
+      if (!args.success) return badArgs(call.name, args.error);
+      const node = needNode(args.data.nodeId);
+      if (typeof node === 'string') return { kind: 'invalid', message: node };
+      return {
+        kind: 'act',
+        action: { type: 'type', nodeId: node.nodeId, text: '', secret: true },
+        why: args.data.why,
+        node,
+        secretRef: args.data.secretName,
       };
     }
 

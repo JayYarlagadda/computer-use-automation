@@ -1,0 +1,125 @@
+{
+  "runId": "79287c94-0848-4c08-a553-d6c8748368f7",
+  "goal": "Look up member 100245 and read their current savings balance",
+  "inputs": [
+    {
+      "name": "memberId",
+      "value": "100245"
+    }
+  ],
+  "startedAt": "2026-09-15T05:12:17.035Z",
+  "finishedAt": "2026-09-15T05:13:08.710Z",
+  "elapsedMs": 51675,
+  "turns": 6,
+  "steps": [
+    {
+      "index": 0,
+      "turn": 1,
+      "why": "Enter operator ID to sign on",
+      "action": {
+        "type": "type",
+        "nodeId": "f0n3",
+        "text": "operator"
+      },
+      "node": {
+        "role": "textbox",
+        "name": ""
+      },
+      "ok": true,
+      "noChange": false,
+      "screenshotPath": "screenshots\\003-turn-2.png"
+    },
+    {
+      "index": 1,
+      "turn": 2,
+      "why": "Enter password to sign on",
+      "action": {
+        "type": "type",
+        "nodeId": "f0n5",
+        "secret": "MERIDIAN_OPERATOR_PASSWORD"
+      },
+      "node": {
+        "role": "textbox",
+        "name": ""
+      },
+      "ok": true,
+      "noChange": false,
+      "screenshotPath": "screenshots\\005-turn-3.png"
+    },
+    {
+      "index": 2,
+      "turn": 3,
+      "why": "Submit login to access application",
+      "action": {
+        "type": "click",
+        "nodeId": "f0n6"
+      },
+      "node": {
+        "role": "button",
+        "name": "Sign On"
+      },
+      "ok": true,
+      "noChange": false,
+      "screenshotPath": "screenshots\\007-turn-4.png"
+    },
+    {
+      "index": 3,
+      "turn": 4,
+      "why": "Enter member ID to search for member",
+      "action": {
+        "type": "type",
+        "nodeId": "f2n3",
+        "text": "100245"
+      },
+      "node": {
+        "role": "textbox",
+        "name": ""
+      },
+      "ok": true,
+      "noChange": false,
+      "screenshotPath": "screenshots\\009-turn-5.png"
+    },
+    {
+      "index": 4,
+      "turn": 5,
+      "why": "Execute member search to view member details",
+      "action": {
+        "type": "click",
+        "nodeId": "f2n7"
+      },
+      "node": {
+        "role": "button",
+        "name": "Search"
+      },
+      "ok": true,
+      "noChange": false,
+      "screenshotPath": "screenshots\\011-turn-6.png"
+    }
+  ],
+  "model": {
+    "provider": "Groq",
+    "model": "openai/gpt-oss-120b",
+    "promptVersion": "discovery/1"
+  },
+  "usage": {
+    "promptTokens": 16715,
+    "completionTokens": 645,
+    "totalTokens": 17360
+  },
+  "evidencePath": "evidence\\2026-09-15T05-12-16-443-discovery-meridian.member.read-savings-balance-79287c94",
+  "status": "succeeded",
+  "success": {
+    "summary": "Retrieved the savings account balance for member 100245",
+    "successText": "Member Detail",
+    "outputs": [
+      {
+        "name": "savingsBalance",
+        "nodeId": "f2n21",
+        "description": "Current savings balance for member 100245",
+        "type": "currency",
+        "sensitivity": "restricted"
+      }
+    ],
+    "finalLocation": "http://127.0.0.1:4173/app"
+  }
+}

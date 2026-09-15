@@ -362,6 +362,16 @@ function compileStep(traceStep: TraceStep, ctx: StepContext): Step | undefined {
       return { ...base, action: { type: 'press', key: action.key } };
 
     case 'type': {
+      if (traceStep.secretRef) {
+        if (!ctx.secrets[traceStep.secretRef]) {
+          ctx.error(
+            `${ctx.at}.action.value`,
+            `The run typed secret "${traceStep.secretRef}", which was not in the declared secrets map.`,
+          );
+          return undefined;
+        }
+        return { ...base, action: { type: 'type', value: { from: 'secret', ref: traceStep.secretRef } } };
+      }
       const value = valueSpecFor(action.text, node, `${ctx.at}.action.value`, ctx);
       if (!value) return undefined;
       return { ...base, action: { type: 'type', value } };

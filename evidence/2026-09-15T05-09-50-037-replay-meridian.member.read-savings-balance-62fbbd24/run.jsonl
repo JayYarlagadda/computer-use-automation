@@ -1,0 +1,2 @@
+{"at":"2026-09-15T05:09:50.334Z","kind":"replay.start","runId":"62fbbd24-dc8e-48d6-962d-9b3ce812c56e","capabilityId":"meridian.member.read-savings-balance","capabilityVersion":"1.0.0","artifactDigest":"925f08c2bb2f328f","tenantId":"a","mode":"unattended","inputNames":["memberId"],"versionDrift":null}
+{"at":"2026-09-15T05:09:50.340Z","kind":"replay.failed","runId":"62fbbd24-dc8e-48d6-962d-9b3ce812c56e","failure":{"code":"NOT_APPROVED","message":"Capability is in state \"draft\". Unattended replay requires an approved capability."}}

@@ -12,13 +12,6 @@ The target is a deliberately hostile mock: a 2003-era frameset with table
 layout, no ids, no test hooks, and not a single `<label for>` on the whole
 sign-on form.
 
-> **Status.** Work in progress. The perception layer, the safety guardrails, the
-> artifact contract and the replay engine are complete and tested end to end
-> against the live target. The discovery loop, the human-in-the-loop console and
-> the CLI are not built yet, so the demo path below covers replay rather than
-> the full round trip. See [`docs/PLAN.md`](docs/PLAN.md) for exactly what is
-> done and what is next.
-
 ---
 
 ## Setup
@@ -39,15 +32,15 @@ npx playwright install chromium
 
 **No API key is needed for anything below.** The target application is a local
 mock, and replay never calls a model — that is the point of the artifact. A key
-is only required for a discovery run, which is not yet wired up.
+is only required for a live `discover` run.
 
 ```bash
 npm run verify
 ```
 
-That typechecks and runs the full suite: **101 tests across five files**. The
-mock bank boots in-process on an OS-assigned port, so there is no second
-terminal to start and nothing to collide with.
+That typechecks, scans for secrets, and runs the full suite: **175 tests
+across ten files**. The mock bank boots in-process on an OS-assigned port, so
+there is no second terminal to start and nothing to collide with.
 
 What those tests actually demonstrate, against a real browser and a real server:
 
@@ -58,7 +51,10 @@ What those tests actually demonstrate, against a real browser and a real server:
 | Data handling | SSNs redacted out of screen text, node names and anchors before anything sees them; sensitive regions masked in the *first* screenshot of a screen; a typed password never captured |
 | Prompt injection | A hostile member record instructs the agent to exfiltrate an SSN, open the admin screen and move money. Every step is refused at the choke point |
 | Artifact | The reference capability validates; undeclared parameters, secret outputs and PII examples are rejected; tenant binding remaps labels and reports version drift |
-| Replay | Happy path with typed outputs; two business outcomes; two recovery paths; a hard failure with a screenshot; escalation; the same artifact run against a second institution |
+| Replay | Happy path with typed outputs; two business outcomes; two recovery paths; a hard failure with a screenshot; the same artifact run against a second institution |
+| Discovery | A scripted model drives the live target; the compiler emits an artifact; that artifact replays for a **different member** with no model in the loop. Budgets, refusals, stalls and `type_secret` are pinned without a provider |
+| Escalation | The automation cannot act while a person holds the session; the person works on the page the run stopped on; the run does not take their word that they finished |
+| CLI | Unknown flags rejected; catalog refuses to publish an invalid artifact; the operator console requires a name to attach and has no "approved, you do it" disposition |
 
 ### Looking at the target application yourself
 
@@ -88,14 +84,66 @@ curl -X POST http://127.0.0.1:4173/_admin/faults \
 are available, each with a consumption budget so a fault can be genuinely
 transient.
 
+## The four commands
+
+Start the target first (`npm run target`). Replay and catalog need no key.
+Discovery needs one.
+
+```bash
+# What a calling agent is handed: typed tools, declared outcomes, approval state.
+npm run catalog
+npm run catalog -- --json
+
+# Deterministic replay. No model is reachable from this path.
+npm run replay -- --capability meridian.member.read-savings-balance --input memberId=100245
+npm run replay -- --capability meridian.member.read-savings-balance --input memberId=999999
+npm run replay -- --capability meridian.member.read-savings-balance --input memberId=100245 --fault session_expired:1:/member/
+
+# A person takes a session an attended replay has stopped on.
+# In a second terminal, once the run prints the console URL:
+npm run operator
+
+# A live model drives the UI and the run is compiled into an artifact.
+# Requires a key in .env (npm run set-key).
+npm run discover -- --capability meridian.member.read-savings-balance \
+  --goal "Look up member {memberId} and read their current savings balance" \
+  --input memberId=100245
+```
+
+Replay exit codes preserve the four-way result: `0` success, `2` a declared
+business outcome, `3` escalated and not resumed, `1` failed. Collapsing outcome
+into failure at the command line would undo the distinction the result type
+exists to make.
+
+Attended replay (the default) starts an operator console. When the run stops,
+it prints `npm run operator -- --url ...` and waits. Unattended replay
+(`--unattended`) records the intervention and expires it immediately — a run
+that needed a human and could not have one, rather than a silent failure with
+a different name.
+
+## Evidence
+
+Recorded runs live in [`evidence/`](evidence/). The one the brief makes
+mandatory is the Groq discovery run against the live target, compiled into a
+capability:
+
+- `evidence/2026-09-15T05-12-16-443-discovery-meridian.member.read-savings-balance-79287c94/`
+
+Replay evidence next to it covers success, a `MEMBER_NOT_FOUND` business
+outcome, a hard failure, and a session-expiry escalation that a person signed
+back on. The callable copy of the reference artifact is
+`artifacts/meridian.member.read-savings-balance.json`.
+
 ## Keys
 
 Copy `.env.example` to `.env` and fill in **one** provider key. Put it in
 `.env`, never in `.env.example` — the example file is tracked, the real one is
-not.
+not. `npm run set-key` is the safer way: it writes `.env` without echoing.
 
 ```bash
 cp .env.example .env
+npm run set-key
+npm run env -- --ping
 ```
 
 No credential is ever written into an artifact, a log or the evidence
@@ -120,9 +168,14 @@ npm run check:secrets
 src/surface/     perceive and act on a surface. The seam to desktop/mainframe.
 src/policy/      allowlist, risk classification, redaction. Enforced in act().
 src/artifact/    the capability contract: schema, validation, tenant binding.
+src/agent/       discovery loop and the trace-to-artifact compiler.
 src/replay/      deterministic execution. Imports nothing from src/llm/.
+src/hitl/        control state machine. One holder, one token, act() checks it.
+src/llm/         provider interface. Discovery only.
+src/evidence/    JSONL run log, screenshots, observations. Redacted at the door.
+src/cli/         discover, replay, catalog, operator.
 targets/meridian a hostile mock back-office, in two tenant configurations.
-docs/            design decisions, and the working plan.
+docs/            design decisions.
 ```
 
 Three ideas carry the whole design, each argued with its alternatives in
@@ -146,7 +199,8 @@ that it makes no difference.
 
 ## Documents
 
-- [`docs/DECISIONS.md`](docs/DECISIONS.md) — thirteen design decisions, each
-  with the options considered, the choice, why, and what would invalidate it.
-- [`docs/PLAN.md`](docs/PLAN.md) — current status and next steps. Working notes
-  rather than a deliverable.
+- [`REPORT.md`](REPORT.md) — architecture, schema, determinism, multi-tenant,
+  escalation, safety, and what was cut. The seven headings the brief asks for.
+- [`docs/DECISIONS.md`](docs/DECISIONS.md) — the long form of those choices,
+  each with the options considered, the choice, why, and what would invalidate
+  it.

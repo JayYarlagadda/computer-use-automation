@@ -1,0 +1,160 @@
+{
+  "observedAt": "2026-09-15T05:12:17.065Z",
+  "location": "http://127.0.0.1:4173/",
+  "title": "CoreBank Servicing - Sign On",
+  "nodes": [
+    {
+      "nodeId": "f0n0",
+      "role": "cell",
+      "name": "Meridian Credit Union CoreBank Servicing v7.2.11",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Meridian Credit Union CoreBank Servicing v7.2.11",
+        "rowText": "Meridian Credit Union CoreBank Servicing v7.2.11",
+        "ordinalInRole": 0,
+        "debugTag": "td"
+      },
+      "framePath": []
+    },
+    {
+      "nodeId": "f0n1",
+      "role": "cell",
+      "name": "Operator Sign On",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 42,
+        "width": 336.78125,
+        "height": 37
+      },
+      "anchors": {
+        "precedingText": "Operator Sign On",
+        "rowText": "Operator Sign On",
+        "ordinalInRole": 1,
+        "debugTag": "td"
+      },
+      "framePath": []
+    },
+    {
+      "nodeId": "f0n2",
+      "role": "cell",
+      "name": "Operator ID",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 79,
+        "width": 113.78125,
+        "height": 39
+      },
+      "anchors": {
+        "precedingText": "Operator ID",
+        "rowText": "Operator ID",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 2,
+        "debugTag": "td"
+      },
+      "framePath": []
+    },
+    {
+      "nodeId": "f0n3",
+      "role": "textbox",
+      "name": "",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 133.78125,
+        "y": 88,
+        "width": 205,
+        "height": 21
+      },
+      "anchors": {
+        "precedingText": "Operator ID",
+        "rowText": "Operator ID",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 0,
+        "debugTag": "input"
+      },
+      "framePath": []
+    },
+    {
+      "nodeId": "f0n4",
+      "role": "cell",
+      "name": "Password",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 118,
+        "width": 113.78125,
+        "height": 39
+      },
+      "anchors": {
+        "precedingText": "Password",
+        "rowText": "Password",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 3,
+        "debugTag": "td"
+      },
+      "framePath": []
+    },
+    {
+      "nodeId": "f0n5",
+      "role": "textbox",
+      "name": "",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "sensitive": true,
+      "bbox": {
+        "x": 133.78125,
+        "y": 127,
+        "width": 205,
+        "height": 21
+      },
+      "anchors": {
+        "precedingText": "Password",
+        "rowText": "Password",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 1,
+        "debugTag": "input"
+      },
+      "framePath": []
+    },
+    {
+      "nodeId": "f0n6",
+      "role": "button",
+      "name": "Sign On",
+      "value": "Sign On",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 133.78125,
+        "y": 166,
+        "width": 64.171875,
+        "height": 21
+      },
+      "anchors": {
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 0,
+        "debugTag": "input"
+      },
+      "framePath": []
+    }
+  ],
+  "text": "Meridian Credit Union   CoreBank Servicing v7.2.11\nOperator Sign On\nOperator ID \nPassword \n \n\nDemo system. Use operator / demo1234."
+}

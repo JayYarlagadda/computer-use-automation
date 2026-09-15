@@ -1,0 +1,356 @@
+{
+  "schemaVersion": "1.0.0",
+  "capability": {
+    "id": "meridian.member.read-savings-balance",
+    "version": "1.0.0",
+    "title": "Read a member's savings balance",
+    "description": "Logs into the Meridian Credit Union core banking system, searches for a member using the supplied member ID, opens the member detail screen, locates the primary Savings account, and returns the current balance of that account. The operation is read‑only and does not modify any data."
+  },
+  "app": {
+    "vendor": "Meridian Systems",
+    "product": "CoreBank Servicing",
+    "productVersion": "7.2.11",
+    "surfaceKind": "browser",
+    "recordedOnTenant": "a"
+  },
+  "inputs": [
+    {
+      "name": "memberId",
+      "type": "string",
+      "description": "The unique identifier of the member whose savings balance is to be retrieved.",
+      "required": true,
+      "sensitivity": "internal",
+      "pattern": "^\\d{6}$",
+      "minLength": 6,
+      "maxLength": 6,
+      "example": "123456"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "savingsBalance",
+      "type": "currency",
+      "description": "Current balance of the member's primary Savings account, expressed as a currency value.",
+      "sensitivity": "restricted",
+      "required": true,
+      "extract": {
+        "kind": "node-text",
+        "target": {
+          "description": "the cell in the \"Savings\" row",
+          "framePath": [
+            "contentFrame"
+          ],
+          "strategies": [
+            {
+              "kind": "anchor",
+              "role": "cell",
+              "rowText": "Savings",
+              "match": "contains",
+              "namePattern": "^[$£€]?\\s*[\\d,]+\\.\\d{2}$"
+            }
+          ],
+          "notes": "Verified against the recorded screen: anchor: cell in the \"Savings\" row matching ^[$£€]?\\s*[\\d,]+\\.\\d{2}$. Rejected: role+name on cell (this control is being read, so its own text is the value -- a locator quoting it would only match the run it was recorded from); anchor: cell under \"Share Accounts\" matching ^[$£€]?\\s*[\\d,]+\\.\\d{2}$ (matched 3 controls on the recorded screen); structural: cell #21 (ordinal rungs are not emitted for extraction -- a wrong position returns a wrong value silently)."
+        },
+        "transforms": [
+          "trim",
+          "strip-currency"
+        ]
+      }
+    }
+  ],
+  "outcomes": [
+    {
+      "code": "MEMBER_NOT_FOUND",
+      "title": "Member Not Found",
+      "description": "The supplied member ID does not correspond to any member in the system.",
+      "detect": {
+        "kind": "text-present",
+        "text": "Member not found.",
+        "match": "contains"
+      },
+      "terminal": true,
+      "outputs": []
+    },
+    {
+      "code": "MEMBER_INACTIVE",
+      "title": "Member Inactive",
+      "description": "The member exists but is marked as inactive or closed.",
+      "detect": {
+        "kind": "text-present",
+        "text": "Member status is inactive.",
+        "match": "contains"
+      },
+      "terminal": true,
+      "outputs": []
+    },
+    {
+      "code": "NO_SAVINGS_ACCOUNT",
+      "title": "No Savings Account",
+      "description": "The member does not have a Savings account on file.",
+      "detect": {
+        "kind": "text-present",
+        "text": "No Savings account found for this member.",
+        "match": "contains"
+      },
+      "terminal": true,
+      "outputs": []
+    },
+    {
+      "code": "ACCOUNT_CLOSED",
+      "title": "Savings Account Closed",
+      "description": "The Savings account exists but is closed, so no balance is available.",
+      "detect": {
+        "kind": "text-present",
+        "text": "Savings account is closed.",
+        "match": "contains"
+      },
+      "terminal": true,
+      "outputs": []
+    },
+    {
+      "code": "INVALID_MEMBER_ID_FORMAT",
+      "title": "Invalid Member ID",
+      "description": "The supplied member ID does not meet the required format (e.g., non‑numeric characters).",
+      "detect": {
+        "kind": "text-present",
+        "text": "Invalid member ID format.",
+        "match": "contains"
+      },
+      "terminal": true,
+      "outputs": []
+    }
+  ],
+  "risk": "reversible",
+  "approval": {
+    "state": "draft"
+  },
+  "steps": [
+    {
+      "id": "1-enter-operator-id-to-sign-on",
+      "intent": "Enter operator ID to sign on",
+      "action": {
+        "type": "type",
+        "value": {
+          "from": "secret",
+          "ref": "MERIDIAN_OPERATOR_ID"
+        }
+      },
+      "target": {
+        "description": "the textbox labelled \"Operator ID\"",
+        "framePath": [],
+        "strategies": [
+          {
+            "kind": "anchor",
+            "role": "textbox",
+            "precedingText": "Operator ID",
+            "match": "exact"
+          },
+          {
+            "kind": "anchor",
+            "role": "textbox",
+            "rowText": "Operator",
+            "match": "contains"
+          },
+          {
+            "kind": "structural",
+            "role": "textbox",
+            "sectionText": "Operator Sign On",
+            "ordinalInRole": 0
+          }
+        ],
+        "notes": "Verified against the recorded screen: anchor: textbox labelled \"Operator ID\"; then anchor: textbox in the \"Operator\" row; then structural: textbox #0 under \"Operator Sign On\". Rejected: role+name on textbox (the control has no accessible name at all)."
+      },
+      "recovery": [],
+      "optional": false,
+      "timeoutMs": 10000
+    },
+    {
+      "id": "2-enter-password-to-sign-on",
+      "intent": "Enter password to sign on",
+      "action": {
+        "type": "type",
+        "value": {
+          "from": "secret",
+          "ref": "MERIDIAN_OPERATOR_PASSWORD"
+        }
+      },
+      "target": {
+        "description": "the textbox labelled \"Password\"",
+        "framePath": [],
+        "strategies": [
+          {
+            "kind": "anchor",
+            "role": "textbox",
+            "precedingText": "Password",
+            "match": "exact"
+          },
+          {
+            "kind": "anchor",
+            "role": "textbox",
+            "rowText": "Password",
+            "match": "contains"
+          },
+          {
+            "kind": "structural",
+            "role": "textbox",
+            "sectionText": "Operator Sign On",
+            "ordinalInRole": 1
+          }
+        ],
+        "notes": "Verified against the recorded screen: anchor: textbox labelled \"Password\"; then anchor: textbox in the \"Password\" row; then structural: textbox #1 under \"Operator Sign On\". Rejected: role+name on textbox (the control has no accessible name at all)."
+      },
+      "recovery": [],
+      "optional": false,
+      "timeoutMs": 10000
+    },
+    {
+      "id": "3-submit-login-to-access-application",
+      "intent": "Submit login to access application",
+      "action": {
+        "type": "click"
+      },
+      "target": {
+        "description": "the button \"Sign On\"",
+        "framePath": [],
+        "strategies": [
+          {
+            "kind": "role-name",
+            "role": "button",
+            "name": "Sign On",
+            "match": "exact"
+          },
+          {
+            "kind": "anchor",
+            "role": "button",
+            "sectionText": "Operator Sign On",
+            "match": "exact",
+            "namePattern": "^Sign On$"
+          },
+          {
+            "kind": "structural",
+            "role": "button",
+            "sectionText": "Operator Sign On",
+            "ordinalInRole": 0
+          }
+        ],
+        "notes": "Verified against the recorded screen: role+name \"Sign On\"; then anchor: button under \"Operator Sign On\" matching ^Sign On$; then structural: button #0 under \"Operator Sign On\"."
+      },
+      "checkpoint": {
+        "kind": "all",
+        "of": [
+          {
+            "kind": "location-matches",
+            "pathTemplate": "/app"
+          },
+          {
+            "kind": "text-present",
+            "text": "CoreBank Servicing",
+            "match": "contains"
+          }
+        ]
+      },
+      "recovery": [],
+      "optional": false,
+      "timeoutMs": 10000
+    },
+    {
+      "id": "4-enter-member-id-to-search-for",
+      "intent": "Enter member ID to search for member",
+      "action": {
+        "type": "type",
+        "value": {
+          "from": "param",
+          "param": "memberId"
+        }
+      },
+      "target": {
+        "description": "the textbox labelled \"Member ID\"",
+        "framePath": [
+          "contentFrame"
+        ],
+        "strategies": [
+          {
+            "kind": "anchor",
+            "role": "textbox",
+            "precedingText": "Member ID",
+            "match": "exact"
+          },
+          {
+            "kind": "anchor",
+            "role": "textbox",
+            "rowText": "Member",
+            "match": "contains"
+          },
+          {
+            "kind": "structural",
+            "role": "textbox",
+            "sectionText": "Member Search",
+            "ordinalInRole": 0
+          }
+        ],
+        "notes": "Verified against the recorded screen: anchor: textbox labelled \"Member ID\"; then anchor: textbox in the \"Member\" row; then structural: textbox #0 under \"Member Search\". Rejected: role+name on textbox (the control has no accessible name at all)."
+      },
+      "recovery": [],
+      "optional": false,
+      "timeoutMs": 10000
+    },
+    {
+      "id": "5-execute-member-search-to-view-member",
+      "intent": "Execute member search to view member details",
+      "action": {
+        "type": "click"
+      },
+      "target": {
+        "description": "the button \"Search\"",
+        "framePath": [
+          "contentFrame"
+        ],
+        "strategies": [
+          {
+            "kind": "role-name",
+            "role": "button",
+            "name": "Search",
+            "match": "exact"
+          },
+          {
+            "kind": "anchor",
+            "role": "button",
+            "sectionText": "Member Search",
+            "match": "exact",
+            "namePattern": "^Search$"
+          },
+          {
+            "kind": "structural",
+            "role": "button",
+            "sectionText": "Member Search",
+            "ordinalInRole": 0
+          }
+        ],
+        "notes": "Verified against the recorded screen: role+name \"Search\"; then anchor: button under \"Member Search\" matching ^Search$; then structural: button #0 under \"Member Search\"."
+      },
+      "recovery": [],
+      "optional": false,
+      "timeoutMs": 10000
+    }
+  ],
+  "successCheckpoint": {
+    "kind": "text-present",
+    "text": "Member Detail",
+    "match": "contains"
+  },
+  "recovery": [],
+  "tenantOverlays": [],
+  "provenance": {
+    "goal": "Look up member {memberId} and read their current savings balance",
+    "recordedAt": "2026-09-15T05:13:08.710Z",
+    "discoveryRunId": "79287c94-0848-4c08-a553-d6c8748368f7",
+    "model": {
+      "provider": "Groq",
+      "model": "openai/gpt-oss-120b",
+      "promptVersion": "discovery/1"
+    },
+    "stepsExplored": 5,
+    "stepsKept": 5,
+    "evidencePath": "evidence\\2026-09-15T05-12-16-443-discovery-meridian.member.read-savings-balance-79287c94"
+  }
+}

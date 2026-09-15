@@ -1,0 +1,125 @@
+{
+  "runId": "478b19be-1cec-4d0d-a039-6a3c37b8febf",
+  "capabilityId": "meridian.member.read-savings-balance",
+  "capabilityVersion": "1.0.0",
+  "artifactDigest": "925f08c2bb2f328f",
+  "tenantId": "a",
+  "mode": "attended",
+  "startedAt": "2026-09-15T05:08:21.894Z",
+  "finishedAt": "2026-09-15T05:08:24.077Z",
+  "durationMs": 2183,
+  "steps": [
+    {
+      "stepId": "open-signon",
+      "intent": "Open the servicing application sign-on screen",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:08:21.898Z",
+      "durationMs": 368,
+      "recoveries": []
+    },
+    {
+      "stepId": "enter-operator",
+      "intent": "Enter the operator ID",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:08:22.266Z",
+      "durationMs": 92,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "enter-password",
+      "intent": "Enter the operator password",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:08:22.358Z",
+      "durationMs": 33,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "submit-signon",
+      "intent": "Submit the sign-on form",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:08:22.391Z",
+      "durationMs": 940,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "role-name",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "dismiss-notice",
+      "intent": "Acknowledge the post-sign-on notice, if this institution shows one",
+      "status": "skipped",
+      "startedAt": "2026-09-15T05:08:23.331Z",
+      "durationMs": 13,
+      "recoveries": []
+    },
+    {
+      "stepId": "enter-member-id",
+      "intent": "Type the member number into the search form",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:08:23.344Z",
+      "durationMs": 50,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "submit-search",
+      "intent": "Run the member search",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:08:23.394Z",
+      "durationMs": 550,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "role-name",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    }
+  ],
+  "degradation": {
+    "degradedSteps": 0,
+    "weakestRank": 0
+  },
+  "evidencePath": "evidence\\2026-09-15T05-08-21-410-replay-meridian.member.read-savings-balance-478b19be",
+  "status": "success",
+  "outputs": {
+    "memberName": {
+      "name": "memberName",
+      "type": "string",
+      "value": "Dana Whitfield",
+      "sensitivity": "restricted"
+    },
+    "savingsBalance": {
+      "name": "savingsBalance",
+      "type": "currency",
+      "value": "4182.55",
+      "sensitivity": "internal"
+    },
+    "savingsAccountNumber": {
+      "name": "savingsAccountNumber",
+      "type": "string",
+      "value": "SV-0044182",
+      "sensitivity": "restricted"
+    }
+  }
+}

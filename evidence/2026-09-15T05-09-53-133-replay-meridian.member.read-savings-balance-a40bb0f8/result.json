@@ -1,0 +1,126 @@
+{
+  "runId": "a40bb0f8-4dd3-40c0-9e10-e560a0c89dc1",
+  "capabilityId": "meridian.member.read-savings-balance",
+  "capabilityVersion": "1.0.0",
+  "artifactDigest": "925f08c2bb2f328f",
+  "tenantId": "a",
+  "mode": "attended",
+  "startedAt": "2026-09-15T05:09:53.442Z",
+  "finishedAt": "2026-09-15T05:10:06.521Z",
+  "durationMs": 13079,
+  "steps": [
+    {
+      "stepId": "open-signon",
+      "intent": "Open the servicing application sign-on screen",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:53.446Z",
+      "durationMs": 371,
+      "recoveries": []
+    },
+    {
+      "stepId": "enter-operator",
+      "intent": "Enter the operator ID",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:53.818Z",
+      "durationMs": 90,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "enter-password",
+      "intent": "Enter the operator password",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:53.908Z",
+      "durationMs": 23,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "submit-signon",
+      "intent": "Submit the sign-on form",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:53.931Z",
+      "durationMs": 452,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "role-name",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "dismiss-notice",
+      "intent": "Acknowledge the post-sign-on notice, if this institution shows one",
+      "status": "skipped",
+      "startedAt": "2026-09-15T05:09:54.383Z",
+      "durationMs": 11,
+      "recoveries": []
+    },
+    {
+      "stepId": "enter-member-id",
+      "intent": "Type the member number into the search form",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:54.395Z",
+      "durationMs": 46,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "submit-search",
+      "intent": "Run the member search",
+      "status": "failed",
+      "startedAt": "2026-09-15T05:09:54.441Z",
+      "durationMs": 12079,
+      "recoveries": [
+        {
+          "ruleId": "retry-transient-app-error",
+          "description": "The servicing host returned an error screen. Retry once before giving up.",
+          "action": "retry-step",
+          "attempt": 1,
+          "succeeded": false
+        }
+      ],
+      "resolution": {
+        "strategyKind": "role-name",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      },
+      "expected": "none of: text \"Member Detail\" present on screen | text \"No member found for number\" present on screen | text \"must be exactly 6 digits\" present on screen | text \"Access Denied\" present on screen",
+      "observed": "\"CoreBank Servicing\" at /app -- Servicing Member Search Transaction History Administration Sign Off Meridian Credit Union CoreBank Servicing v7.2.11 Unexpected System Error The servicing host did not respond. Reference: SYS-500",
+      "screenshotPath": "screenshots\\001-submit-search-checkpoint.png",
+      "observationPath": "observations\\002-submit-search-checkpoint.json"
+    }
+  ],
+  "degradation": {
+    "degradedSteps": 0,
+    "weakestRank": 0
+  },
+  "evidencePath": "evidence\\2026-09-15T05-09-53-133-replay-meridian.member.read-savings-balance-a40bb0f8",
+  "status": "failed",
+  "failure": {
+    "code": "APP_ERROR",
+    "message": "Step \"submit-search\" (Run the member search) did not reach its expected state.",
+    "stepId": "submit-search",
+    "expected": "any of: text \"Member Detail\" present on screen OR text \"No member found for number\" present on screen OR text \"must be exactly 6 digits\" present on screen OR text \"Access Denied\" present on screen",
+    "observed": "\"CoreBank Servicing\" at /app -- Servicing Member Search Transaction History Administration Sign Off Meridian Credit Union CoreBank Servicing v7.2.11 Unexpected System Error The servicing host did not respond. Reference: SYS-500",
+    "screenshotPath": "screenshots\\001-submit-search-checkpoint.png",
+    "observationPath": "observations\\002-submit-search-checkpoint.json"
+  }
+}

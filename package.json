@@ -10,6 +10,11 @@
   "scripts": {
     "target": "tsx targets/meridian/server.ts",
     "target:b": "tsx targets/meridian/server.ts --tenant b --port 4174",
+    "cli": "tsx src/cli/index.ts",
+    "discover": "tsx src/cli/index.ts discover",
+    "replay": "tsx src/cli/index.ts replay",
+    "catalog": "tsx src/cli/index.ts catalog",
+    "operator": "tsx src/cli/index.ts operator",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "set-key": "node scripts/set-key.mjs",

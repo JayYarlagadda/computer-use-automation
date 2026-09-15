@@ -1,0 +1,413 @@
+{
+  "observedAt": "2026-09-15T05:11:29.982Z",
+  "location": "http://127.0.0.1:4173/app",
+  "title": "CoreBank Servicing",
+  "nodes": [
+    {
+      "nodeId": "f1n0",
+      "role": "cell",
+      "name": "Servicing",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Servicing",
+        "rowText": "Servicing",
+        "ordinalInRole": 0,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n1",
+      "role": "cell",
+      "name": "Member Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 31,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Member Search",
+        "rowText": "Member Search",
+        "sectionText": "Servicing",
+        "ordinalInRole": 1,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n2",
+      "role": "link",
+      "name": "Member Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 37,
+        "width": 125.90625,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Member Search",
+        "rowText": "Member Search",
+        "sectionText": "Servicing",
+        "ordinalInRole": 0,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n3",
+      "role": "cell",
+      "name": "Transaction History",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 62,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Transaction History",
+        "rowText": "Transaction History",
+        "sectionText": "Servicing",
+        "ordinalInRole": 2,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n4",
+      "role": "link",
+      "name": "Transaction History",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 68,
+        "width": 154.078125,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Transaction History",
+        "rowText": "Transaction History",
+        "sectionText": "Servicing",
+        "ordinalInRole": 1,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n5",
+      "role": "cell",
+      "name": "Administration",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 93,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Administration",
+        "rowText": "Administration",
+        "sectionText": "Servicing",
+        "ordinalInRole": 3,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n6",
+      "role": "link",
+      "name": "Administration",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 99,
+        "width": 116.703125,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Administration",
+        "rowText": "Administration",
+        "sectionText": "Servicing",
+        "ordinalInRole": 2,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n7",
+      "role": "cell",
+      "name": "Sign Off",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 124,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Sign Off",
+        "rowText": "Sign Off",
+        "sectionText": "Servicing",
+        "ordinalInRole": 4,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n8",
+      "role": "link",
+      "name": "Sign Off",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 130,
+        "width": 64.890625,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Sign Off",
+        "rowText": "Sign Off",
+        "sectionText": "Servicing",
+        "ordinalInRole": 3,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n0",
+      "role": "cell",
+      "name": "Meridian Credit Union CoreBank Servicing v7.2.11",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 1099,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Meridian Credit Union CoreBank Servicing v7.2.11",
+        "rowText": "Meridian Credit Union CoreBank Servicing v7.2.11",
+        "ordinalInRole": 0,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n1",
+      "role": "cell",
+      "name": "Operator Sign On",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 42,
+        "width": 444.234375,
+        "height": 37
+      },
+      "anchors": {
+        "precedingText": "Operator Sign On",
+        "rowText": "Operator Sign On",
+        "ordinalInRole": 1,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n2",
+      "role": "cell",
+      "name": "Your session has expired. Please sign on again.",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 79,
+        "width": 444.234375,
+        "height": 37
+      },
+      "anchors": {
+        "precedingText": "Your session has expired. Please sign on again.",
+        "rowText": "Your session has expired. Please sign on again.",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 2,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n3",
+      "role": "cell",
+      "name": "Operator ID",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 116,
+        "width": 150.078125,
+        "height": 39
+      },
+      "anchors": {
+        "precedingText": "Operator ID",
+        "rowText": "Operator ID",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 3,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n4",
+      "role": "textbox",
+      "name": "",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 170.078125,
+        "y": 125,
+        "width": 205,
+        "height": 21
+      },
+      "anchors": {
+        "precedingText": "Operator ID",
+        "rowText": "Operator ID",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 0,
+        "debugTag": "input"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n5",
+      "role": "cell",
+      "name": "Password",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 155,
+        "width": 150.078125,
+        "height": 39
+      },
+      "anchors": {
+        "precedingText": "Password",
+        "rowText": "Password",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 4,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n6",
+      "role": "textbox",
+      "name": "",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "sensitive": true,
+      "bbox": {
+        "x": 170.078125,
+        "y": 164,
+        "width": 205,
+        "height": 21
+      },
+      "anchors": {
+        "precedingText": "Password",
+        "rowText": "Password",
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 1,
+        "debugTag": "input"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n7",
+      "role": "button",
+      "name": "Sign On",
+      "value": "Sign On",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 170.078125,
+        "y": 203,
+        "width": 64.171875,
+        "height": 21
+      },
+      "anchors": {
+        "sectionText": "Operator Sign On",
+        "ordinalInRole": 0,
+        "debugTag": "input"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    }
+  ],
+  "text": "Servicing\nMember Search\nTransaction History\nAdministration\nSign Off\nMeridian Credit Union   CoreBank Servicing v7.2.11\nOperator Sign On\nYour session has expired. Please sign on again.\nOperator ID \nPassword \n \n\nDemo system. Use operator / demo1234."
+}

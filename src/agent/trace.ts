@@ -34,6 +34,12 @@ export interface TraceStep {
   /** True when the screen was indistinguishable afterwards. */
   noChange?: boolean;
   screenshotPath?: string;
+  /**
+   * Set when the model asked to type a named credential. The action's `text`
+   * is empty in the trace -- the value is substituted only on the way to the
+   * surface -- and the compiler turns this into `{ from: 'secret', ref }`.
+   */
+  secretRef?: string;
 }
 
 export type DiscoveryFailureCode =

@@ -538,9 +538,9 @@ function script(memberId: string) {
       }
       if (!typedPass) {
         typedPass = true;
-        return call('type_text', {
+        return call('type_secret', {
           nodeId: pick(request, /labelled-by="Password"/),
-          text: DEMO_PASS,
+          secretName: 'MERIDIAN_OPERATOR_PASSWORD',
           why: 'Enter the operator password',
         });
       }
@@ -567,6 +567,7 @@ async function discoverLive(): Promise<void> {
       surface: harness.surface,
       provider: createScriptedProvider(script(MEMBER_ID)),
       policy: policyFor(harness.target.url),
+      secrets: SECRETS,
       maxTurns: 10,
     });
 

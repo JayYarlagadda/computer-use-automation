@@ -1,0 +1,1011 @@
+{
+  "observedAt": "2026-09-15T05:12:56.092Z",
+  "location": "http://127.0.0.1:4173/app",
+  "title": "CoreBank Servicing",
+  "nodes": [
+    {
+      "nodeId": "f1n0",
+      "role": "cell",
+      "name": "Servicing",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Servicing",
+        "rowText": "Servicing",
+        "ordinalInRole": 0,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n1",
+      "role": "cell",
+      "name": "Member Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 31,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Member Search",
+        "rowText": "Member Search",
+        "sectionText": "Servicing",
+        "ordinalInRole": 1,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n2",
+      "role": "link",
+      "name": "Member Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 37,
+        "width": 125.90625,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Member Search",
+        "rowText": "Member Search",
+        "sectionText": "Servicing",
+        "ordinalInRole": 0,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n3",
+      "role": "cell",
+      "name": "Transaction History",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 62,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Transaction History",
+        "rowText": "Transaction History",
+        "sectionText": "Servicing",
+        "ordinalInRole": 2,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n4",
+      "role": "link",
+      "name": "Transaction History",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 68,
+        "width": 154.078125,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Transaction History",
+        "rowText": "Transaction History",
+        "sectionText": "Servicing",
+        "ordinalInRole": 1,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n5",
+      "role": "cell",
+      "name": "Administration",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 93,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Administration",
+        "rowText": "Administration",
+        "sectionText": "Servicing",
+        "ordinalInRole": 3,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n6",
+      "role": "link",
+      "name": "Administration",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 99,
+        "width": 116.703125,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Administration",
+        "rowText": "Administration",
+        "sectionText": "Servicing",
+        "ordinalInRole": 2,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n7",
+      "role": "cell",
+      "name": "Sign Off",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 124,
+        "width": 180,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Sign Off",
+        "rowText": "Sign Off",
+        "sectionText": "Servicing",
+        "ordinalInRole": 4,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f1n8",
+      "role": "link",
+      "name": "Sign Off",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 6,
+        "y": 130,
+        "width": 64.890625,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Sign Off",
+        "rowText": "Sign Off",
+        "sectionText": "Servicing",
+        "ordinalInRole": 3,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "navFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n0",
+      "role": "cell",
+      "name": "Meridian Credit Union CoreBank Servicing v7.2.11",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 0,
+        "y": 0,
+        "width": 1099,
+        "height": 31
+      },
+      "anchors": {
+        "precedingText": "Meridian Credit Union CoreBank Servicing v7.2.11",
+        "rowText": "Meridian Credit Union CoreBank Servicing v7.2.11",
+        "ordinalInRole": 0,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n1",
+      "role": "cell",
+      "name": "Member Detail",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 42,
+        "width": 436.546875,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Member Detail",
+        "rowText": "Member Detail",
+        "ordinalInRole": 1,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n2",
+      "role": "cell",
+      "name": "Member ID",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 75,
+        "width": 103.59375,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Member ID",
+        "rowText": "Member ID100245 NameDana Whitfield",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 2,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n3",
+      "role": "cell",
+      "name": "100245",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 114.59375,
+        "y": 75,
+        "width": 120.078125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Member ID",
+        "rowText": "Member ID100245 NameDana Whitfield",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 3,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n4",
+      "role": "cell",
+      "name": "Name",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 234.671875,
+        "y": 75,
+        "width": 65.625,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "100245",
+        "rowText": "Member ID100245 NameDana Whitfield",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 4,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n5",
+      "role": "cell",
+      "name": "Dana Whitfield",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 300.296875,
+        "y": 75,
+        "width": 147.25,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Name",
+        "rowText": "Member ID100245 NameDana Whitfield",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 5,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n6",
+      "role": "cell",
+      "name": "SSN",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 108,
+        "width": 103.59375,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "SSN",
+        "rowText": "SSN[REDACTED] Joined2014-03-11",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 6,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n7",
+      "role": "cell",
+      "name": "[REDACTED]",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "sensitive": true,
+      "bbox": {
+        "x": 114.59375,
+        "y": 108,
+        "width": 120.078125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "SSN",
+        "rowText": "SSN[REDACTED] Joined2014-03-11",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 7,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n8",
+      "role": "cell",
+      "name": "Joined",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 234.671875,
+        "y": 108,
+        "width": 65.625,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "[REDACTED]",
+        "rowText": "SSN[REDACTED] Joined2014-03-11",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 8,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n9",
+      "role": "cell",
+      "name": "2014-03-11",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 300.296875,
+        "y": 108,
+        "width": 147.25,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Joined",
+        "rowText": "SSN[REDACTED] Joined2014-03-11",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 9,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n10",
+      "role": "cell",
+      "name": "Branch",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 141,
+        "width": 103.59375,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Branch",
+        "rowText": "BranchRiversideStatusActive",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 10,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n11",
+      "role": "cell",
+      "name": "Riverside",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 114.59375,
+        "y": 141,
+        "width": 120.078125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Branch",
+        "rowText": "BranchRiversideStatusActive",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 11,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n12",
+      "role": "cell",
+      "name": "Status",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 234.671875,
+        "y": 141,
+        "width": 65.625,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Riverside",
+        "rowText": "BranchRiversideStatusActive",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 12,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n13",
+      "role": "cell",
+      "name": "Active",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 300.296875,
+        "y": 141,
+        "width": 147.25,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Status",
+        "rowText": "BranchRiversideStatusActive",
+        "sectionText": "Member Detail",
+        "ordinalInRole": 13,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n14",
+      "role": "cell",
+      "name": "Share Accounts",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 195,
+        "width": 447.8125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Share Accounts",
+        "rowText": "Share Accounts",
+        "ordinalInRole": 14,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n15",
+      "role": "cell",
+      "name": "Type",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 228,
+        "width": 96.03125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Type",
+        "rowText": "TypeAccount No.Current BalanceStatus",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 15,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n16",
+      "role": "cell",
+      "name": "Account No.",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 107.03125,
+        "y": 228,
+        "width": 122.109375,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Type",
+        "rowText": "TypeAccount No.Current BalanceStatus",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 16,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n17",
+      "role": "cell",
+      "name": "Current Balance",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 229.140625,
+        "y": 228,
+        "width": 158.140625,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Account No.",
+        "rowText": "TypeAccount No.Current BalanceStatus",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 17,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n18",
+      "role": "cell",
+      "name": "Status",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 387.28125,
+        "y": 228,
+        "width": 71.53125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Current Balance",
+        "rowText": "TypeAccount No.Current BalanceStatus",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 18,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n19",
+      "role": "cell",
+      "name": "Savings",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 261,
+        "width": 96.03125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Savings",
+        "rowText": "Savings SV-0044182 $4,182.55 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 19,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n20",
+      "role": "cell",
+      "name": "SV-0044182",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 107.03125,
+        "y": 261,
+        "width": 122.109375,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Savings",
+        "rowText": "Savings SV-0044182 $4,182.55 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 20,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n21",
+      "role": "cell",
+      "name": "$4,182.55",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 229.140625,
+        "y": 261,
+        "width": 158.140625,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "SV-0044182",
+        "rowText": "Savings SV-0044182 $4,182.55 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 21,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n22",
+      "role": "cell",
+      "name": "Open",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 387.28125,
+        "y": 261,
+        "width": 71.53125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "$4,182.55",
+        "rowText": "Savings SV-0044182 $4,182.55 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 22,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n23",
+      "role": "cell",
+      "name": "Checking",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 294,
+        "width": 96.03125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Checking",
+        "rowText": "Checking CK-0044183 $912.30 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 23,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n24",
+      "role": "cell",
+      "name": "CK-0044183",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 107.03125,
+        "y": 294,
+        "width": 122.109375,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Checking",
+        "rowText": "Checking CK-0044183 $912.30 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 24,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n25",
+      "role": "cell",
+      "name": "$912.30",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 229.140625,
+        "y": 294,
+        "width": 158.140625,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "CK-0044183",
+        "rowText": "Checking CK-0044183 $912.30 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 25,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n26",
+      "role": "cell",
+      "name": "Open",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 387.28125,
+        "y": 294,
+        "width": 71.53125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "$912.30",
+        "rowText": "Checking CK-0044183 $912.30 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 26,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n27",
+      "role": "cell",
+      "name": "Certificate",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 11,
+        "y": 327,
+        "width": 96.03125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Certificate",
+        "rowText": "Certificate CD-0044184 $15,000.00 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 27,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n28",
+      "role": "cell",
+      "name": "CD-0044184",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 107.03125,
+        "y": 327,
+        "width": 122.109375,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "Certificate",
+        "rowText": "Certificate CD-0044184 $15,000.00 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 28,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n29",
+      "role": "cell",
+      "name": "$15,000.00",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 229.140625,
+        "y": 327,
+        "width": 158.140625,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "CD-0044184",
+        "rowText": "Certificate CD-0044184 $15,000.00 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 29,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n30",
+      "role": "cell",
+      "name": "Open",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 387.28125,
+        "y": 327,
+        "width": 71.53125,
+        "height": 33
+      },
+      "anchors": {
+        "precedingText": "$15,000.00",
+        "rowText": "Certificate CD-0044184 $15,000.00 Open",
+        "sectionText": "Share Accounts",
+        "ordinalInRole": 30,
+        "debugTag": "td"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n31",
+      "role": "link",
+      "name": "Post Balance Adjustment",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 10,
+        "y": 380,
+        "width": 200.140625,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "Share Accounts TypeAccount No.Current BalanceStatus Savings SV-0044182 $4,182.55 Open Checking CK-0044183 $912.30 Open C",
+        "rowText": "Member Detail Member ID100245 NameDana Whitfield SSN[REDACTED] Joined2014-03-11 BranchRiversideStatusActive Share Accounts TypeAccount No.Current BalanceStatus Savings SV-0044182 $4,182.55 Open Checking CK-0044183 $912.30 Open Certificate ",
+        "ordinalInRole": 0,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    },
+    {
+      "nodeId": "f2n32",
+      "role": "link",
+      "name": "Back to Member Search",
+      "enabled": true,
+      "visible": true,
+      "focused": false,
+      "bbox": {
+        "x": 234.28125,
+        "y": 380,
+        "width": 191.546875,
+        "height": 19
+      },
+      "anchors": {
+        "precedingText": "|",
+        "rowText": "Member Detail Member ID100245 NameDana Whitfield SSN[REDACTED] Joined2014-03-11 BranchRiversideStatusActive Share Accounts TypeAccount No.Current BalanceStatus Savings SV-0044182 $4,182.55 Open Checking CK-0044183 $912.30 Open Certificate ",
+        "ordinalInRole": 1,
+        "debugTag": "a"
+      },
+      "framePath": [
+        "contentFrame"
+      ]
+    }
+  ],
+  "text": "Servicing\nMember Search\nTransaction History\nAdministration\nSign Off\nMeridian Credit Union   CoreBank Servicing v7.2.11\nMember Detail\nMember ID 100245 Name Dana Whitfield\nSSN [REDACTED] Joined 2014-03-11\nBranch Riverside Status Active\n\nShare Accounts\nType Account No. Current Balance Status\nSavings SV-0044182 $4,182.55 Open\nChecking CK-0044183 $912.30 Open\nCertificate CD-0044184 $15,000.00 Open\n\nPost Balance Adjustment  | Back to Member Search"
+}

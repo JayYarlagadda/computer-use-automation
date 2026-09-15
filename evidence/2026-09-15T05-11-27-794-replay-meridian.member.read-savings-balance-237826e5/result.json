@@ -1,0 +1,120 @@
+{
+  "runId": "237826e5-cf25-4c2c-99c9-f39af3c2299e",
+  "capabilityId": "meridian.member.read-savings-balance",
+  "capabilityVersion": "1.0.0",
+  "artifactDigest": "925f08c2bb2f328f",
+  "tenantId": "a",
+  "mode": "attended",
+  "startedAt": "2026-09-15T05:11:28.085Z",
+  "finishedAt": "2026-09-15T05:11:30.372Z",
+  "durationMs": 2287,
+  "steps": [
+    {
+      "stepId": "open-signon",
+      "intent": "Open the servicing application sign-on screen",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:11:28.090Z",
+      "durationMs": 368,
+      "recoveries": []
+    },
+    {
+      "stepId": "enter-operator",
+      "intent": "Enter the operator ID",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:11:28.458Z",
+      "durationMs": 48,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "enter-password",
+      "intent": "Enter the operator password",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:11:28.506Z",
+      "durationMs": 19,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "submit-signon",
+      "intent": "Submit the sign-on form",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:11:28.525Z",
+      "durationMs": 889,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "role-name",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "dismiss-notice",
+      "intent": "Acknowledge the post-sign-on notice, if this institution shows one",
+      "status": "skipped",
+      "startedAt": "2026-09-15T05:11:29.415Z",
+      "durationMs": 19,
+      "recoveries": []
+    },
+    {
+      "stepId": "enter-member-id",
+      "intent": "Type the member number into the search form",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:11:29.434Z",
+      "durationMs": 67,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "submit-search",
+      "intent": "Run the member search",
+      "status": "failed",
+      "startedAt": "2026-09-15T05:11:29.501Z",
+      "durationMs": 467,
+      "recoveries": [
+        {
+          "ruleId": "reauthenticate",
+          "description": "The session expired mid-flow. Sign on again, then retry the step.",
+          "action": "run-capability",
+          "attempt": 1,
+          "succeeded": false
+        }
+      ],
+      "resolution": {
+        "strategyKind": "role-name",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    }
+  ],
+  "degradation": {
+    "degradedSteps": 0,
+    "weakestRank": 0
+  },
+  "evidencePath": "evidence\\2026-09-15T05-11-27-794-replay-meridian.member.read-savings-balance-237826e5",
+  "status": "escalated",
+  "escalation": {
+    "reason": "RECOVERY_EXHAUSTED",
+    "message": "Recovery needs capability \"meridian.auth.sign-on\", which this runtime cannot invoke.",
+    "stepId": "submit-search",
+    "sessionId": "237826e5-cf25-4c2c-99c9-f39af3c2299e",
+    "interventionId": "24d600c2-11d5-4869-badf-df170afa8651"
+  }
+}

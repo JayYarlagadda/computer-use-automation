@@ -10,6 +10,7 @@ dist/
 # Local scratch runs. Curated runs under evidence/ ARE committed on purpose.
 evidence/scratch/
 interventions/
+.tmp/
 
 .DS_Store
 Thumbs.db

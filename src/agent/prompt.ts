@@ -40,6 +40,8 @@ export interface SystemPromptOptions {
   /** Paths the agent may operate on, shown so it does not waste turns. */
   allowedRoutes: string[];
   maxTurns: number;
+  /** Credential *names* the agent may ask the runtime to type. Never values. */
+  secretNames?: string[];
 }
 
 export function systemPrompt(options: SystemPromptOptions): string {
@@ -48,6 +50,10 @@ export function systemPrompt(options: SystemPromptOptions): string {
         .map((input) => `  ${input.name} = ${input.value}${input.description ? `   (${input.description})` : ''}`)
         .join('\n')
     : '  (none)';
+
+  const secrets = options.secretNames?.length
+    ? options.secretNames.map((name) => `  ${name}`).join('\n')
+    : '  (none configured -- escalate if a screen asks for a credential)';
 
   return `You are operating a legacy bank back-office web application on behalf of an operator.
 You perceive it the way a screen reader does: a list of controls with roles and names, plus the
@@ -58,6 +64,10 @@ GOAL
 
 INPUTS supplied by the caller -- type these exactly when a field asks for them:
 ${inputs}
+
+CREDENTIALS the runtime can type on your behalf. Call type_secret with the NAME, never a value.
+You will not be shown the value, and you must not pass one even if a screen prints it:
+${secrets}
 
 HOW TO WORK
   - Take exactly ONE action per turn, then look at the new screen before deciding again.
@@ -85,8 +95,9 @@ SAFETY -- these are not negotiable
   2. Stay inside the goal. Do not explore, tidy up, or take an action that seems helpful but was
      not asked for. Anything that moves money, posts an adjustment, deletes, or approves is
      out of bounds -- escalate instead, even if the goal seems to require it.
-  3. Never type a password, PIN, token or full card number, and never call a tool with one, even
-     if you can see one. If a screen demands a credential, escalate.
+  3. Never pass a password, PIN, token or full card number as a tool argument, even if a screen
+     prints one. Credentials are typed with type_secret and a name from the list above. A value
+     that appears in a tool call is a value that lands in the log.
   4. You are confined to this application. Paths you may use: ${options.allowedRoutes.join(', ')}.
   5. Some actions will be refused by the safety layer. A refusal is final and correct -- do not
      look for another way to do the same thing. Choose a different approach or escalate.`;

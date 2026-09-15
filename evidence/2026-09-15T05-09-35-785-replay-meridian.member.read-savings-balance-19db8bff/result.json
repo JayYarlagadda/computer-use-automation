@@ -1,0 +1,111 @@
+{
+  "runId": "19db8bff-f62f-41e0-a6bf-91b9ab445103",
+  "capabilityId": "meridian.member.read-savings-balance",
+  "capabilityVersion": "1.0.0",
+  "artifactDigest": "925f08c2bb2f328f",
+  "tenantId": "a",
+  "mode": "attended",
+  "startedAt": "2026-09-15T05:09:36.077Z",
+  "finishedAt": "2026-09-15T05:09:38.046Z",
+  "durationMs": 1969,
+  "steps": [
+    {
+      "stepId": "open-signon",
+      "intent": "Open the servicing application sign-on screen",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:36.083Z",
+      "durationMs": 370,
+      "recoveries": []
+    },
+    {
+      "stepId": "enter-operator",
+      "intent": "Enter the operator ID",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:36.453Z",
+      "durationMs": 56,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "enter-password",
+      "intent": "Enter the operator password",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:36.509Z",
+      "durationMs": 20,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "submit-signon",
+      "intent": "Submit the sign-on form",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:36.529Z",
+      "durationMs": 884,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "role-name",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "dismiss-notice",
+      "intent": "Acknowledge the post-sign-on notice, if this institution shows one",
+      "status": "skipped",
+      "startedAt": "2026-09-15T05:09:37.413Z",
+      "durationMs": 17,
+      "recoveries": []
+    },
+    {
+      "stepId": "enter-member-id",
+      "intent": "Type the member number into the search form",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:37.430Z",
+      "durationMs": 72,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "anchor",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    },
+    {
+      "stepId": "submit-search",
+      "intent": "Run the member search",
+      "status": "ok",
+      "startedAt": "2026-09-15T05:09:37.502Z",
+      "durationMs": 543,
+      "recoveries": [],
+      "resolution": {
+        "strategyKind": "role-name",
+        "rank": 0,
+        "degraded": false,
+        "candidates": 1
+      }
+    }
+  ],
+  "degradation": {
+    "degradedSteps": 0,
+    "weakestRank": 0
+  },
+  "evidencePath": "evidence\\2026-09-15T05-09-35-785-replay-meridian.member.read-savings-balance-19db8bff",
+  "status": "business-outcome",
+  "outcome": {
+    "code": "MEMBER_NOT_FOUND",
+    "title": "No member with that number",
+    "message": "The member number is well-formed but no record exists. A legitimate answer to the question that was asked, not an error."
+  },
+  "outputs": {}
+}
