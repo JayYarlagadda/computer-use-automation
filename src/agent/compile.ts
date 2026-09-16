@@ -183,6 +183,29 @@ export function compile(options: CompileOptions): CompileResult {
     if (compiled) steps.push(compiled);
   });
 
+  // Discovery is often started already on the application front door (the CLI
+  // navigates there so the model does not spend a turn on it). Replay starts
+  // from a blank page. If the trace never navigated, the compiled flow would
+  // try to type into Operator ID on about:blank. Insert the missing entry.
+  if (steps.length && !steps.some((s) => s.action.type === 'navigate')) {
+    const landing = run.steps[0]?.observationBefore;
+    const path = landing ? pathOf(landing.location) : '';
+    if (path === '/' || path === '/login') {
+      const entry: Step = {
+        id: 'open-application',
+        intent: 'Open the application',
+        action: { type: 'navigate', location: { pathTemplate: path, params: {} } },
+        recovery: [],
+        optional: false,
+        timeoutMs: 10_000,
+        ...(landing?.text.includes('Operator Sign On')
+          ? { checkpoint: { kind: 'text-present' as const, text: 'Operator Sign On', match: 'contains' as const } }
+          : {}),
+      };
+      steps.unshift(entry);
+    }
+  }
+
   if (!steps.length) {
     error('steps', 'Nothing survived compilation: the run reached its goal without any usable action.');
   }

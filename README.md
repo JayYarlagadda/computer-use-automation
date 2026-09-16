@@ -44,7 +44,7 @@ what was cut.
 
 | Asked | Where it lives |
 | --- | --- |
-| Natural-language goal → LLM drives a real UI | `npm run discover`; Groq run in `evidence/…-discovery-…/` |
+| Natural-language goal → LLM drives a real UI | `npm run discover`; `npm run test:live`; Groq run in `evidence/…-discovery-…/` |
 | Compile the run into a typed, versioned capability, not a transcript dump | `src/agent/compile.ts`; `artifacts/meridian.member.read-savings-balance.json` |
 | Deterministic replay, no model in the loop | `src/replay/`; `src/replay/` imports nothing from `src/llm/` |
 | Typed outputs | Replay result `outputs`; tests in `tests/replay.test.ts` |
@@ -85,7 +85,11 @@ model. A key is only for a live `discover` run.
 npm run verify
 ```
 
-Typecheck, secret scan, and **175 tests across ten files**. The mock boots
+Typecheck, secret scan, and **175 tests across ten files** with no API
+key. If `.env` has a Groq key, three more run in an eleventh file: a real
+model drives the live bank, the compiler emits an artifact, and replay
+answers for a member the live run never saw. `npm run test:live` is that
+file alone. `LIVE_LLM=0 npm test` skips it even when a key is present.
 in-process on an OS-assigned port, so a developer’s own `npm run target` on
 :4173 cannot collide with the suite.
 
@@ -97,7 +101,7 @@ in-process on an OS-assigned port, so a developer’s own `npm run target` on
 | Prompt injection | Member `100250` tells the agent to exfiltrate an SSN, open admin, and move money. Every step is refused at `act()`, assuming the model complied |
 | Artifact | Reference capability validates. Undeclared params, secret outputs and PII examples are rejected. Tenant binding remaps labels and reports version drift |
 | Replay | Happy path with typed outputs; two business outcomes; two recoveries; a hard failure with a screenshot; the same artifact against a second institution |
-| Discovery | A scripted model drives the live target; the compiler emits an artifact; that artifact replays for a **different member** with no model. Budgets, refusals, stalls and `type_secret` are pinned without a provider |
+| Discovery | A scripted model covers the loop without a key. With `GROQ_API_KEY`, `npm run test:live` is Groq → compile → replay for a **different member** |
 | Escalation | Automation cannot `act()` while a person holds the session. The person is on the page the run stopped on. “Done” with no change is `CHECKPOINT_FAILED` |
 | CLI | Unknown flags rejected. Catalog will not publish an invalid artifact. Operator attach requires a name. There is no “approved, you do it” disposition |
 
@@ -159,6 +163,8 @@ npm run operator
 A live discovery run needs a key (`npm run set-key`, then `npm run env -- --ping`):
 
 ```bash
+npm run test:live
+
 npm run discover -- --capability meridian.member.read-savings-balance \
   --goal "Look up member {memberId} and read their current savings balance" \
   --input memberId=100245

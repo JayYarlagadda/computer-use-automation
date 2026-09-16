@@ -127,7 +127,9 @@ interstitial, session expiry, transient slowness, application error.
 (`src/agent/discover.ts`, `tests/discover.test.ts`): turn budget, wall
 clock, consecutive incoherent replies, consecutive no-ops, repeated
 policy refusals (those escalate — the goal needs authority the agent does
-not have).
+not have). When `GROQ_API_KEY` is set, `tests/live-discovery.test.ts` is
+the same loop with the real provider: discover, compile, replay for a
+member the live run never saw.
 
 On resume, the executor re-checks the step’s own checkpoint against the
 screen the operator left. “Done” with no change is `CHECKPOINT_FAILED`
@@ -254,7 +256,8 @@ grant that bypasses `act()`.
 
 **No Anthropic / Gemini in the factory.** Discovery speaks
 OpenAI-compatible (Groq, OpenAI). The recorded evidence run used Groq.
-Tests use a scripted provider and do not need a key.
+The default suite uses a scripted provider so a reviewer with no key can
+still run it. `npm run test:live` is Groq.
 
 **No desktop `Surface` implementation.** The seam is there. A fake second
 backend would not have proved it.

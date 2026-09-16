@@ -17,6 +17,7 @@
     "operator": "tsx src/cli/index.ts operator",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:live": "vitest run tests/live-discovery.test.ts",
     "set-key": "node scripts/set-key.mjs",
     "env": "node scripts/env-status.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
